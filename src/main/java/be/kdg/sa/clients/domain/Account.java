@@ -2,7 +2,7 @@ package be.kdg.sa.clients.domain;
 
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
 
-// @Entity
+//@Entity
 public class Account {
 
     private String lastName;
