@@ -1,11 +1,18 @@
-package be.kdg.sa.clients.domain;
+package be.kdg.sa.clients.controller.dto;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-// @Entity
-public class Product {
+public class ProductDto {
+    @NotNull
+    @NotEmpty
     private UUID productId;
+
+    @NotNull
+    @NotEmpty
     private String name;
     private Double price;
     private String description;
@@ -13,13 +20,18 @@ public class Product {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    public Product(String name, Double price, String description, int quantity, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    public ProductDto(UUID productId, String name, Double price, String description, int quantity, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+        this.productId = productId;
         this.name = name;
         this.price = price;
         this.description = description;
         this.quantity = quantity;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
+    }
+
+    public UUID getProductId() {
+        return productId;
     }
 
     public String getName() {
@@ -44,6 +56,10 @@ public class Product {
 
     public LocalDateTime getModifiedDate() {
         return modifiedDate;
+    }
+
+    public void setProductId(UUID productId) {
+        this.productId = productId;
     }
 
     public void setName(String name) {

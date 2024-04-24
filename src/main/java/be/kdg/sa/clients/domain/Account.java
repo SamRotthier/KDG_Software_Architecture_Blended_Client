@@ -2,9 +2,12 @@ package be.kdg.sa.clients.domain;
 
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
 
+import java.util.UUID;
+
 //@Entity
 public class Account {
 
+    private UUID accountId;
     private String lastName;
     private String firstName;
     private String email;
@@ -13,7 +16,8 @@ public class Account {
 
     private AccountRelationType type;
 
-    public Account(String lastName, String firstName, String email, String company, int points, AccountRelationType type) {
+    public Account(UUID accountId, String lastName, String firstName, String email, String company, int points, AccountRelationType type) {
+        this.accountId = accountId;
         this.lastName = lastName;
         this.firstName = firstName;
         this.email = email;
@@ -22,6 +26,9 @@ public class Account {
         this.type = type;
     }
 
+    public UUID getAccountId() {
+        return accountId;
+    }
     public String getLastName() {
         return lastName;
     }
@@ -46,6 +53,9 @@ public class Account {
         return type;
     }
 
+    public void setAccountId(UUID accountId) {
+        this.accountId = accountId;
+    }
     public void setLastName(String lastName) {
         if(firstName == null || firstName.equals("")){
             throw new IllegalArgumentException("Enter a name.");

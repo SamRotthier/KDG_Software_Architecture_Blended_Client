@@ -2,32 +2,33 @@ package be.kdg.sa.clients.controller;
 
 import be.kdg.sa.clients.domain.Product;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/product")
+@RequestMapping("/orders")
 public class OrderController {
 
-    @PostMapping("/createorder")
+    @GetMapping("/")
+    public void getOrders (@RequestParam){
+    }
+    @PostMapping("/")
     public void CreateOrder (@RequestBody String xml){
 
     }
 
-    @PostMapping("/confirmorder")
-    public void ConfirmOrder (@RequestBody int  orderNr){
+
+    @PutMapping("/{orderid}/confirm")
+    public void ConfirmOrder (@RequestParam int  orderNr){
 
     }
 
-    @PostMapping("/cancelorder")
-    public void CancelOrder (@RequestBody int orderNr){
+    @PutMapping("/{orderid}/cancel")
+    public void CancelOrder (@RequestParam int orderNr){
 
     }
 
-    @GetMapping("/getorder")
-    public void GetOrder (@RequestBody int orderNr){
+    @GetMapping("/{orderid}")
+    public void GetOrder (@RequestParam int orderNr){
 
     }
 

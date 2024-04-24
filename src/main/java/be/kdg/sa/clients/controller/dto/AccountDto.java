@@ -4,7 +4,13 @@ import be.kdg.sa.clients.domain.Enum.AccountRelationType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.UUID;
+
 public class AccountDto {
+    @NotNull
+    @NotEmpty
+    private UUID accountId;
+
     @NotNull
     @NotEmpty
     private String lastName;
@@ -24,7 +30,8 @@ public class AccountDto {
     public AccountDto() {
     }
 
-    public AccountDto(String lastName, String firstName, String email, String company, AccountRelationType type) {
+    public AccountDto(UUID accountId, String lastName, String firstName, String email, String company, AccountRelationType type) {
+        this.accountId = accountId;
         this.lastName = lastName;
         this.firstName = firstName;
         this.email = email;
@@ -32,6 +39,9 @@ public class AccountDto {
         this.type = type;
     }
 
+    public UUID getAccountId() {
+        return accountId;
+    }
     public String getLastName() {
         return lastName;
     }
@@ -52,6 +62,9 @@ public class AccountDto {
         return type;
     }
 
+    public void setAccountId(UUID accountId) {
+        this.accountId = accountId;
+    }
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
@@ -71,4 +84,5 @@ public class AccountDto {
     public void setType(AccountRelationType type) {
         this.type = type;
     }
+
 }
