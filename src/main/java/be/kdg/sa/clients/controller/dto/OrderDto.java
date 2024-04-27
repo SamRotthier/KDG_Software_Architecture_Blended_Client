@@ -11,7 +11,12 @@ import java.util.UUID;
 
 public record OrderDto(UUID orderId, UUID accountId , LocalDateTime creationDateTime ,OrderStatus status, double totalPrice, List<ProductDto> products) {
     public OrderDto(Order order, Account account){
-        this(order.getOrderId(), account.getAccountId(), order.getCreationDateTime(), order.getStatus(), order.getTotalPrice(), order.getProducts().stream().map(ProductDto::new).toList());
+        this(order.getOrderId(),
+                account.getAccountId(),
+                order.getCreationDateTime(),
+                order.getStatus(),
+                order.getTotalPrice(),
+                order.getProducts().stream().map(ProductDto::new).toList());
     }
 
 }
