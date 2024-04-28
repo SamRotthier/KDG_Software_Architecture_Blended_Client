@@ -1,12 +1,15 @@
 package be.kdg.sa.clients.domain;
 
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import java.util.UUID;
 
-//@Entity
+@Entity
 public class Account {
 
+    @Id
     private UUID accountId;
     private String lastName;
     private String firstName;
@@ -15,7 +18,9 @@ public class Account {
     private int points;
 
     private AccountRelationType type;
+    public Account() {
 
+    }
     public Account(UUID accountId, String lastName, String firstName, String email, String company, int points, AccountRelationType type) {
         this.accountId = accountId;
         this.lastName = lastName;
@@ -25,6 +30,7 @@ public class Account {
         this.points = points;
         this.type = type;
     }
+
 
     public UUID getAccountId() {
         return accountId;

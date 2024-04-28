@@ -13,7 +13,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/orders")
 public class OrderController {
-
+/*
     @GetMapping("/")
     public void getOrders (@RequestParam){
     }
@@ -42,5 +42,5 @@ public class OrderController {
         }
 
     }
-
+*/
 }

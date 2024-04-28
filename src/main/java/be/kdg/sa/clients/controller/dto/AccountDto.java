@@ -9,10 +9,6 @@ import java.util.UUID;
 public class AccountDto {
     @NotNull
     @NotEmpty
-    private UUID accountId;
-
-    @NotNull
-    @NotEmpty
     private String lastName;
     @NotNull
     @NotEmpty
@@ -30,17 +26,12 @@ public class AccountDto {
     public AccountDto() {
     }
 
-    public AccountDto(UUID accountId, String lastName, String firstName, String email, String company, AccountRelationType type) {
-        this.accountId = accountId;
+    public AccountDto(String lastName, String firstName, String email, String company, AccountRelationType type) {
         this.lastName = lastName;
         this.firstName = firstName;
         this.email = email;
         this.company = company;
         this.type = type;
-    }
-
-    public UUID getAccountId() {
-        return accountId;
     }
     public String getLastName() {
         return lastName;
@@ -62,9 +53,6 @@ public class AccountDto {
         return type;
     }
 
-    public void setAccountId(UUID accountId) {
-        this.accountId = accountId;
-    }
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }

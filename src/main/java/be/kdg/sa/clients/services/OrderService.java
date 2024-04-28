@@ -6,6 +6,11 @@ import java.util.Arrays;
 
 @Service
 public class OrderService {
-    public static Arrays getOrders() {
+
+    public OrderService() {
     }
+
+    /* public static Arrays getOrders() {
+
+    } */
 }

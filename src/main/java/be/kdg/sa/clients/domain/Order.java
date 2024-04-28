@@ -1,12 +1,16 @@
 package be.kdg.sa.clients.domain;
 
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Entity
 public class Order {
+    @Id
     private UUID orderId;
     private List<Product> products;
     private OrderStatus status;
