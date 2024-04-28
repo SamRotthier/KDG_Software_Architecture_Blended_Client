@@ -1,14 +1,7 @@
 package be.kdg.sa.clients.controller;
 
-import be.kdg.sa.clients.controller.dto.OrderDto;
-import be.kdg.sa.clients.domain.Product;
-import be.kdg.sa.clients.services.OrderService;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/orders")

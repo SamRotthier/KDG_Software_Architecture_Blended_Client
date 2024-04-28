@@ -1,13 +1,5 @@
 package be.kdg.sa.clients.controller.dto;
 
-import be.kdg.sa.clients.domain.Account;
-import be.kdg.sa.clients.domain.Enum.OrderStatus;
-import be.kdg.sa.clients.domain.Order;
-import be.kdg.sa.clients.domain.Product;
-
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 

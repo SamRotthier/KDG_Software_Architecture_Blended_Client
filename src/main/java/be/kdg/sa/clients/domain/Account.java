@@ -1,8 +1,7 @@
 package be.kdg.sa.clients.domain;
 
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.UUID;
 
@@ -10,6 +9,7 @@ import java.util.UUID;
 public class Account {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID accountId;
     private String lastName;
     private String firstName;
@@ -17,10 +17,11 @@ public class Account {
     private String company;
     private int points;
 
+    @Enumerated(EnumType.STRING)
     private AccountRelationType type;
     public Account() {
-
     }
+
     public Account(UUID accountId, String lastName, String firstName, String email, String company, int points, AccountRelationType type) {
         this.accountId = accountId;
         this.lastName = lastName;
