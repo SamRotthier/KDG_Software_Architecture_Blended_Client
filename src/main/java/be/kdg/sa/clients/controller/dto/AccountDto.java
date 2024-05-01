@@ -19,8 +19,6 @@ public class AccountDto {
 
     private String company;
 
-    @NotNull
-    @NotEmpty
     private AccountRelationType type;
 
     public AccountDto() {

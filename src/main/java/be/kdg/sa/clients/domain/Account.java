@@ -65,7 +65,7 @@ public class Account {
         this.accountId = accountId;
     }
     public void setLastName(String lastName) {
-        if(firstName == null || firstName.equals("")){
+        if(lastName == null || lastName.equals("")){
             throw new IllegalArgumentException("Enter a name.");
         }
         this.lastName = lastName;
