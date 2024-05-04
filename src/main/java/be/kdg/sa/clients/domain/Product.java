@@ -2,6 +2,7 @@ package be.kdg.sa.clients.domain;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -12,13 +13,13 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID productId;
     private String name;
-    private Double price;
+    private BigDecimal price;
     private String description;
     private int quantity;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    public Product(UUID productId, String name, Double price, String description, int quantity, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    public Product(UUID productId, String name, BigDecimal price, String description, int quantity, LocalDateTime createdDate, LocalDateTime modifiedDate) {
         this.productId = productId;
         this.name = name;
         this.price = price;
@@ -39,7 +40,7 @@ public class Product {
         return name;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
@@ -67,7 +68,7 @@ public class Product {
         this.name = name;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

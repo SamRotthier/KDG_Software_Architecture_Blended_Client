@@ -5,12 +5,10 @@ import be.kdg.sa.clients.domain.Product;
 import be.kdg.sa.clients.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/products")
@@ -35,8 +33,18 @@ public class ProductController {
 
     }
 
+    @PatchMapping("/{productId}/price")
+    public ResponseEntity<ProductDto> setProductPrice(@PathVariable("productId") UUID id, @RequestParam Double price){
+        Product product = productService.setProductPrice(id, price);
+        if(product != null){
+            return ResponseEntity.ok(convertToDto(product));
+        } else{
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     private ProductDto convertToDto(Product product){
-        ProductDto productDto = new ProductDto(
+        return new ProductDto(
                 product.getProductId(),
                 product.getName(),
                 product.getPrice(),
@@ -45,6 +53,5 @@ public class ProductController {
                 product.getCreatedDate(),
                 product.getModifiedDate()
         );
-        return productDto;
     }
 }

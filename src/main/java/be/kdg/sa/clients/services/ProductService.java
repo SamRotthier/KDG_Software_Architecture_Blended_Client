@@ -5,8 +5,10 @@ import be.kdg.sa.clients.domain.Product;
 import be.kdg.sa.clients.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ProductService {
@@ -21,4 +23,14 @@ public class ProductService {
         return productRepository.getAllByPriceIsNull();
     }
 
+    public Product setProductPrice(UUID id, Double price) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if(optionalProduct.isPresent()){
+            Product product = optionalProduct.get();
+            product.setPrice(BigDecimal.valueOf(price));
+            return productRepository.save(product);
+        } else {
+            throw new IllegalArgumentException("Product with ID" + id + "was not found");
+        }
+    }
 }
