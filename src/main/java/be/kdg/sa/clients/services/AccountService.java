@@ -3,10 +3,12 @@ package be.kdg.sa.clients.services;
 import be.kdg.sa.clients.controller.dto.AccountDto;
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.repositories.AccountRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,5 +36,19 @@ public class AccountService {
         account.setType(accountDto.getType());
 
        return accountRepository.save(account);
+    }
+
+    @Transactional
+    public void deleteAccount(UUID accountId){
+        Account account = accountRepository.findByAccountId(accountId);
+        accountRepository.deleteByAccountId(accountId);
+    }
+    public boolean exists(UUID accountId){
+        Account accountExists = accountRepository.findByAccountId(accountId);
+        return accountExists != null;
+    }
+
+    public Optional<Account> getAccountByLastName(String lastName) {
+        return accountRepository.findAccountByLastName(lastName);
     }
 }
