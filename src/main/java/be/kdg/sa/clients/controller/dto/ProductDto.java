@@ -7,12 +7,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class ProductDto {
-    @NotNull
-    @NotEmpty
     private UUID productId;
-
-    @NotNull
-    @NotEmpty
     private String name;
     private Double price;
     private String description;
