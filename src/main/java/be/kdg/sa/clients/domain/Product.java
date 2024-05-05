@@ -65,6 +65,9 @@ public class Product {
     }
 
     public void setName(String name) {
+        if(name == null || name.equals("")){
+            throw new IllegalArgumentException("Enter a name.");
+        }
         this.name = name;
     }
 
@@ -73,6 +76,9 @@ public class Product {
     }
 
     public void setDescription(String description) {
+        if(description == null || description.equals("")){
+            throw new IllegalArgumentException("Enter a description.");
+        }
         this.description = description;
     }
 
