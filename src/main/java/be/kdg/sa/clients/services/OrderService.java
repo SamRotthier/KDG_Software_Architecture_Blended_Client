@@ -53,5 +53,8 @@ public class OrderService {
         foundOrder.ifPresent(order -> order.setStatus(OrderStatus.CANCELLED));
     }
 
+    public Optional<List<Order>> getOrders(){
+        return Optional.of(orderRepository.findAll());
+    }
 
 }

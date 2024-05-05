@@ -29,7 +29,9 @@ public class OrderController {
     }
 
     @GetMapping("/")
-    public void getOrders (@PathVariable String name){
+    public ResponseEntity<?> GetOrders (){
+        Optional<List<Order>> foundOrders = orderService.getOrders();
+        return foundOrders.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/create")
