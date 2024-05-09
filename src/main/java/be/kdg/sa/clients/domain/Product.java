@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "products")
+@Table(name = "cl_product")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

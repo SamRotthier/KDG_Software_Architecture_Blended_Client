@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "cl_order")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
