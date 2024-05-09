@@ -3,6 +3,7 @@ package be.kdg.sa.clients.controller;
 import be.kdg.sa.clients.controller.dto.ProductDto;
 import be.kdg.sa.clients.domain.Product;
 import be.kdg.sa.clients.services.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{productId}/price")
-    public ResponseEntity<ProductDto> setProductPrice(@PathVariable("productId") UUID id, @RequestParam Double price){
+    public ResponseEntity<ProductDto> setProductPrice(@Valid @PathVariable("productId") UUID id, @RequestParam Double price){
         Product product = productService.setProductPrice(id, price);
         if(product != null){
             return ResponseEntity.ok(convertToDto(product));

@@ -74,4 +74,22 @@ _eventuele vragen voor je coach_
 
 ### Feedback
 
-_(in te vullen na gesprek)_
+Eerst en vooral moeten we meer gebruik maken van de GitLab functionaliteiten. Zo kunnen we bijvoorbeeld een extra tag/ lane toevoegen voor de issues die in progress zijn en nog getest moeten worden.
+
+Over het algemeen was er nog niet veel feedback doordat onze opdracht nog niet ver gevorderd was. Echter de delen die al gecodeerd zijn, vond de docent goed en volgens de juiste principes. Om toch zeker te zijn van onze code, mogen we de komende weken nog de vraag stellen om door de code te gaan. Verder werd ons ook aangeraden om niet teveel tijd te verliezen met Docker, en eerder te focussen op de andere functionaliteiten.
+
+#### In detail:  
+
+**Clients**
+- clients applicatie accountdto error handling: voor de @Valid annotatie dient er geen extra controle te gebeuren op de bindingresult (if functie).
+- ProductService: illegal argument exception. Hierbij beter een custom exception maken en in de controller opvangen
+- OrderController: annotatie @Controller => @RestController
+    - RestController aangezien het een REST API betreft. Controller wordt gebruikt bij bv. MVC waar je met een frontend werkt (zoals in de Bakery API)
+- Bij OrderService benaming lijkt op Dotnet benaming. Juiste semantiek toepassen. 
+
+**Bakery**
+- ProductController: annotatie @RestController => @Controller  
+
+**Warehouse**  
+- Geen templates folder nodig
+- @Valid notatie (zie clients opmerking)

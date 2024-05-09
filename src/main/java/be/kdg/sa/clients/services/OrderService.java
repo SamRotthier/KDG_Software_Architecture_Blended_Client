@@ -45,11 +45,11 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public void ConfirmOrder(Optional<Order> foundOrder) {
+    public void confirmOrder(Optional<Order> foundOrder) {
         foundOrder.ifPresent(order -> order.setStatus(OrderStatus.CONFIRMED));
     }
 
-    public void CancelOrder(Optional<Order> foundOrder) {
+    public void cancelOrder(Optional<Order> foundOrder) {
         foundOrder.ifPresent(order -> order.setStatus(OrderStatus.CANCELLED));
     }
 

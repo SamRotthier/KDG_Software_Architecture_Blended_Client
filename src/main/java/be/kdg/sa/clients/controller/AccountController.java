@@ -24,10 +24,7 @@ public class AccountController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createAccount(@Valid @RequestBody AccountDto accountDto, BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
-            return ResponseEntity.badRequest().body("Invalid request body");
-        }
+    public ResponseEntity<?> createAccount(@Valid @RequestBody AccountDto accountDto){
        accountService.createAccount(accountDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Account was successfully created");
     }

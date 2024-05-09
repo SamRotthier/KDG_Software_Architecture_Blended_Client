@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequestMapping("/orders")
 public class OrderController {
 
@@ -29,53 +29,50 @@ public class OrderController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<?> GetOrders (){
+    public ResponseEntity<?> getOrders (){
         Optional<List<Order>> foundOrders = orderService.getOrders();
         return foundOrders.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> CreateOrder (@Valid @RequestBody OrderDto orderDto, BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
-            return ResponseEntity.badRequest().body("Invalid request body for the creation of an order");
-        }
+    public ResponseEntity<?> createOrder (@Valid @RequestBody OrderDto orderDto, BindingResult bindingResult){
         orderService.createOrder(orderDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("The order was successfully created");
     }
 
 
     @PutMapping("/{orderid}/confirm") //TODO
-    public ResponseEntity<?> ConfirmOrder (@PathVariable UUID orderId, BindingResult bindingResult){
+    public ResponseEntity<?> confirmOrder (@Valid @PathVariable UUID orderId){
         Optional<Order> foundOrder = orderService.getOrderByOrderId(orderId);
-        if(bindingResult.hasErrors() || foundOrder.isEmpty()){
+        if(foundOrder.isEmpty()){
             return ResponseEntity.badRequest().body("Invalid orderId");
         }
 
         if (foundOrder.get().getStatus() == OrderStatus.CONFIRMED || foundOrder.get().getStatus() == OrderStatus.CANCELLED){
             return ResponseEntity.badRequest().body("We could not confirm the order. The order is already: " + foundOrder.get().getStatus());
         }else{
-            orderService.ConfirmOrder(foundOrder);
+            orderService.confirmOrder(foundOrder);
             return ResponseEntity.status(HttpStatus.CREATED).body("The order was confirmed");
         }
     }
 
     @PutMapping("/{orderid}/cancel") //TODO
-    public ResponseEntity<?> CancelOrder (@PathVariable UUID orderId, BindingResult bindingResult){
+    public ResponseEntity<?> cancelOrder (@PathVariable UUID orderId){
         Optional<Order> foundOrder = orderService.getOrderByOrderId(orderId);
-        if(bindingResult.hasErrors() || foundOrder.isEmpty()){
-            return ResponseEntity.badRequest().body("Invalid orderId");
+        if(foundOrder.isEmpty()){
+            return ResponseEntity.badRequest().body("Invalid orderId"); //TODO
         }
 
         if (foundOrder.get().getStatus() == OrderStatus.CONFIRMED || foundOrder.get().getStatus() == OrderStatus.CANCELLED){
             return ResponseEntity.badRequest().body("We could not confirm the order. The order is already: " + foundOrder.get().getStatus());
         }else{
-            orderService.CancelOrder(foundOrder);
+            orderService.cancelOrder(foundOrder);
             return ResponseEntity.status(HttpStatus.CREATED).body("The order was confirmed");
         }
     }
 
     @GetMapping("/{orderId}")
-    public ResponseEntity<?> GetOrder (@PathVariable UUID orderId){
+    public ResponseEntity<?> getOrder (@PathVariable UUID orderId){
          Optional<Order> foundOrder = orderService.getOrderByOrderId(orderId);
         return foundOrder.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
