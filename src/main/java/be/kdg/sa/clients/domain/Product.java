@@ -1,9 +1,11 @@
 package be.kdg.sa.clients.domain;
 
+import be.kdg.sa.clients.domain.Enum.ProductState;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -16,6 +18,11 @@ public class Product {
     private BigDecimal price;
     private String description;
     private int quantity;
+    @OneToMany(mappedBy = "product")
+    private List<OrderProduct> orders;
+    @Enumerated(EnumType.STRING)
+    private ProductState productState;
+
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 

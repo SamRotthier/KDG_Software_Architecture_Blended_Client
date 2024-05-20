@@ -2,6 +2,7 @@ package be.kdg.sa.clients.domain;
 
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,8 +16,10 @@ public class Order {
     private UUID orderId;
     @OneToMany
     private List<Product> products;
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
     private double totalPrice;
+    @CreationTimestamp
     private LocalDateTime creationDateTime;
     private LocalDateTime modifiedDateTime;
     private LocalDateTime confirmationDateTime;
@@ -100,12 +103,6 @@ public class Order {
 
     public void setAccount(Account account) {
         this.account = account;
-    }
-
-    public void cancelOrder (){
-        if (status == OrderStatus.PENDING){
-            status = OrderStatus.CANCELLED;
-        }
     }
 
 }
