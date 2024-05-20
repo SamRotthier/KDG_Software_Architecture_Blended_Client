@@ -1,13 +1,14 @@
 package be.kdg.sa.clients.receivers;
 
 import be.kdg.sa.clients.config.RabbitTopology;
-import be.kdg.sa.clients.controller.dto.OrderDto;
 import be.kdg.sa.clients.controller.dto.ProductDto;
 import be.kdg.sa.clients.services.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class ProductReceiver {
@@ -24,9 +25,10 @@ public class ProductReceiver {
         productService.addProductFromMessage(productDto);
     }
 
-    @RabbitListener(queues = RabbitTopology.DEACTIVATE_PRODUCT_QUEUE, messageConverter = "#{jackson2JsonMessageConverter}")
-    public void receiveDeactivateProduct(OrderDto product) {
-        //productService.addProduct(product.getId(), product.getName(), product.getDescription());
-        System.out.println(product);
+    @RabbitListener(queues = RabbitTopology.PRODUCT_STATE_QUEUE, messageConverter = "#{jackson2JsonMessageConverter}")
+    public void receiveDeactivateProduct(UUID productNumber) {
+        logger.info("Received a new deactivation message for product id: {}", productNumber);
+        productService.deactivateProductById(productNumber);
+
     }
 }

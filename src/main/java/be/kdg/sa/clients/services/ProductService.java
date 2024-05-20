@@ -1,6 +1,7 @@
 package be.kdg.sa.clients.services;
 
 import be.kdg.sa.clients.controller.dto.ProductDto;
+import be.kdg.sa.clients.domain.Enum.ProductState;
 import be.kdg.sa.clients.domain.Product;
 import be.kdg.sa.clients.repositories.ProductRepository;
 import org.slf4j.Logger;
@@ -44,5 +45,19 @@ public class ProductService {
 
         productRepository.save(product);
         logger.info("A new product was saved in the db with name: {}", product.getName());
+    }
+
+    public void deactivateProductById(UUID productNumber) {
+        Optional<Product> optionalProduct = productRepository.getProductByProductId(productNumber);
+
+        if (optionalProduct.isEmpty()) {
+            logger.warn("Product with id {} was not found", productNumber);
+            return;
+        }
+
+        Product product = optionalProduct.get();
+        product.setProductState(product.getProductState()==ProductState.ACTIVE ? ProductState.INACTIVE : ProductState.ACTIVE);
+        productRepository.save(product);
+
     }
 }

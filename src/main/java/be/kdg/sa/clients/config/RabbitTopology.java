@@ -1,14 +1,10 @@
 package be.kdg.sa.clients.config;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitTopology {
     public final static String NEW_PRODUCT_QUEUE = "new-product-queue";
     public final static String ORDER_PRODUCT_QUEUE = "order-product-queue";
-    public final static String DEACTIVATE_PRODUCT_QUEUE = "deactivate-product-queue";
+    public final static String PRODUCT_STATE_QUEUE = "product-state-queue";
     public static final String TOPIC_EXCHANGE = "bakery-exchange";
 
 
@@ -38,25 +34,25 @@ public class RabbitTopology {
     }
 
     @Bean
-    public Queue orderProductQueue() {
+    public Queue newOrderProductQueue() {
         return new Queue(ORDER_PRODUCT_QUEUE, false);
     }
 
 
     @Bean
     public Binding topicOrderProductBinding() {
-        return BindingBuilder.bind(newProductQueue()).to(topicExchange()).with(ORDER_PRODUCT_QUEUE);
+        return BindingBuilder.bind(newOrderProductQueue()).to(topicExchange()).with(ORDER_PRODUCT_QUEUE);
     }
 
     @Bean
-    public Queue deactivateProductQueue() {
-        return new Queue(DEACTIVATE_PRODUCT_QUEUE, false);
+    public Queue newProductStateQueue() {
+        return new Queue(PRODUCT_STATE_QUEUE, false);
     }
 
 
     @Bean
-    public Binding topicDeactivateProductBinding() {
-        return BindingBuilder.bind(newProductQueue()).to(topicExchange()).with(DEACTIVATE_PRODUCT_QUEUE);
+    public Binding topicProductStateBinding() {
+        return BindingBuilder.bind(newProductStateQueue()).to(topicExchange()).with(PRODUCT_STATE_QUEUE);
     }
 
 

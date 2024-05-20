@@ -26,7 +26,7 @@ public class Product {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    public Product(UUID productId, String name, BigDecimal price, String description, int quantity, LocalDateTime createdDate, LocalDateTime modifiedDate) {
+    public Product(UUID productId, String name, BigDecimal price, String description, int quantity, LocalDateTime createdDate, LocalDateTime modifiedDate, ProductState productState) {
         this.productId = productId;
         this.name = name;
         this.price = price;
@@ -34,6 +34,7 @@ public class Product {
         this.quantity = quantity;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
+        this.productState=productState;
     }
 
     public Product() {
@@ -65,6 +66,14 @@ public class Product {
 
     public LocalDateTime getModifiedDate() {
         return modifiedDate;
+    }
+
+    public List<OrderProduct> getOrders() {
+        return orders;
+    }
+
+    public ProductState getProductState() {
+        return productState;
     }
 
     public void setProductId(UUID productId) {
@@ -99,5 +108,13 @@ public class Product {
 
     public void setModifiedDate(LocalDateTime modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    public void setOrders(List<OrderProduct> orders) {
+        this.orders = orders;
+    }
+
+    public void setProductState(ProductState productState) {
+        this.productState = productState;
     }
 }
