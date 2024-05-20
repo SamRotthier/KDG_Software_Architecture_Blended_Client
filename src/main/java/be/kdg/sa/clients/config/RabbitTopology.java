@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitTopology {
     public final static String NEW_PRODUCT_QUEUE = "new-product-queue";
+    public final static String ORDER_PRODUCT_QUEUE = "order-product-queue";
+    public final static String DEACTIVATE_PRODUCT_QUEUE = "deactivate-product-queue";
     public static final String TOPIC_EXCHANGE = "bakery-exchange";
 
 
@@ -35,6 +37,27 @@ public class RabbitTopology {
         return BindingBuilder.bind(newProductQueue()).to(topicExchange()).with(NEW_PRODUCT_QUEUE);
     }
 
+    @Bean
+    public Queue orderProductQueue() {
+        return new Queue(ORDER_PRODUCT_QUEUE, false);
+    }
+
+
+    @Bean
+    public Binding topicOrderProductBinding() {
+        return BindingBuilder.bind(newProductQueue()).to(topicExchange()).with(ORDER_PRODUCT_QUEUE);
+    }
+
+    @Bean
+    public Queue deactivateProductQueue() {
+        return new Queue(DEACTIVATE_PRODUCT_QUEUE, false);
+    }
+
+
+    @Bean
+    public Binding topicDeactivateProductBinding() {
+        return BindingBuilder.bind(newProductQueue()).to(topicExchange()).with(DEACTIVATE_PRODUCT_QUEUE);
+    }
 
 
     @Bean

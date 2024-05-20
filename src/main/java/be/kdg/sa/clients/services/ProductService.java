@@ -3,6 +3,8 @@ package be.kdg.sa.clients.services;
 import be.kdg.sa.clients.controller.dto.ProductDto;
 import be.kdg.sa.clients.domain.Product;
 import be.kdg.sa.clients.repositories.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,6 +14,7 @@ import java.util.UUID;
 
 @Service
 public class ProductService {
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     private final ProductRepository productRepository;
 
@@ -32,5 +35,14 @@ public class ProductService {
         } else {
             throw new IllegalArgumentException("Product with ID" + id + "was not found");
         }
+    }
+
+    public void addProductFromMessage(ProductDto productDto) {
+        Product product = new Product();
+        product.setProductId(productDto.getProductId());
+        product.setName(productDto.getName());
+
+        productRepository.save(product);
+        logger.info("A new product was saved in the db with name: {}", product.getName());
     }
 }
