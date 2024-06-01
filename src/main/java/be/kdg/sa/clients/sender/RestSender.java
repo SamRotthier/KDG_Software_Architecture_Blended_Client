@@ -24,12 +24,10 @@ public class RestSender {
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
 
-    private final OrderService orderService;
 
-    public RestSender(RabbitTemplate rabbitTemplate, ObjectMapper objectMapper,OrderService orderService) {
+    public RestSender(RabbitTemplate rabbitTemplate, ObjectMapper objectMapper) {
         this.rabbitTemplate = rabbitTemplate;
         this.objectMapper = objectMapper;
-        this.orderService= orderService;
     }
 
     @PostMapping("/deliver/{uuid}")

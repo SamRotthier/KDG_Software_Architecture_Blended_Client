@@ -24,7 +24,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
-    private final RestSender restSender;
+    private RestSender restSender;
 
 
     @Autowired
@@ -46,8 +46,6 @@ public class OrderService {
         order.setStatus(orderDto.getStatus());
         order.setTotalPrice(orderDto.getTotalPrice());
         order.setCreationDateTime(orderDto.getCreationDateTime());
-        order.setModifiedDateTime(orderDto.getCreationDateTime());
-        order.setCreationDateTime(orderDto.getCreationDateTime()); //java.time.LocalDateTime.now()
         order.setAccount(orderDto.getAccount());
 
         return orderRepository.save(order);

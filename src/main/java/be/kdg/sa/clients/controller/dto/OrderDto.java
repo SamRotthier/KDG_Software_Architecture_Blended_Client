@@ -21,20 +21,16 @@ public class OrderDto {
     private OrderStatus status;
     private double totalPrice;
     private LocalDateTime creationDateTime;
-    //private LocalDateTime modifiedDateTime;
-    //private LocalDateTime confirmationDateTime;
 
     private Account account;
 
 
-    public OrderDto(UUID orderId, List<Product> products, OrderStatus status, double totalPrice, LocalDateTime creationDateTime, LocalDateTime modifiedDateTime, LocalDateTime confirmationDateTime, Account account) {
+    public OrderDto(UUID orderId, List<Product> products, OrderStatus status, double totalPrice, LocalDateTime creationDateTime, Account account) {
         this.orderId = orderId;
         this.products = products;
         this.status = status;
         this.totalPrice = totalPrice;
         this.creationDateTime = creationDateTime;
-        //this.modifiedDateTime = modifiedDateTime;
-        //this.confirmationDateTime = confirmationDateTime;
         this.account = account;
     }
     public OrderDto() {
@@ -61,14 +57,6 @@ public class OrderDto {
         return creationDateTime;
     }
 
-    //public LocalDateTime getModifiedDateTime() {
-    //    return modifiedDateTime;
-    //}
-
-    //public LocalDateTime getConfirmationDateTime() {
-    //    return confirmationDateTime;
-    //}
-
     public Account getAccount() {
         return account;
     }
@@ -92,14 +80,6 @@ public class OrderDto {
     public void setCreationDateTime(LocalDateTime creationDateTime) {
         this.creationDateTime = creationDateTime;
     }
-
-    //public void setModifiedDateTime(LocalDateTime modifiedDateTime) {
-    //    this.modifiedDateTime = modifiedDateTime;
-    //}
-
-    //public void setConfirmationDateTime(LocalDateTime confirmationDateTime) {
-    //    this.confirmationDateTime = confirmationDateTime;
-    //}
 
     public void setAccount(Account account) {
         this.account = account;
