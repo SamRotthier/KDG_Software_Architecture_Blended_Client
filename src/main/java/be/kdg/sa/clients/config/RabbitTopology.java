@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 //Works with rabbit amqp
 @Configuration
 public class RabbitTopology {
-    public final static String NEW_PRODUCT_QUEUE = "new-product-queue";
+    public final static String NEW_PRODUCT_CLIENT_QUEUE = "new-product-client-queue";
     public final static String ORDER_PRODUCT_QUEUE = "order-product-queue";
     public final static String PRODUCT_STATE_QUEUE = "product-state-queue";
     public static final String TOPIC_EXCHANGE = "bakery-exchange";
@@ -24,13 +24,13 @@ public class RabbitTopology {
 
     @Bean
     public Queue newProductQueue() {
-        return new Queue(NEW_PRODUCT_QUEUE, false);
+        return new Queue(NEW_PRODUCT_CLIENT_QUEUE, false);
     }
 
 
     @Bean
     public Binding topicNewProductBinding() {
-        return BindingBuilder.bind(newProductQueue()).to(topicExchange()).with(NEW_PRODUCT_QUEUE);
+        return BindingBuilder.bind(newProductQueue()).to(topicExchange()).with(NEW_PRODUCT_CLIENT_QUEUE);
     }
 
     @Bean
