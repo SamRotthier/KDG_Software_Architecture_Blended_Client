@@ -2,6 +2,7 @@ package be.kdg.sa.clients.domain;
 
 import be.kdg.sa.clients.domain.Enum.ProductState;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,17 +24,16 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductState productState;
 
+    @CreationTimestamp
     private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
 
-    public Product(UUID productId, String name, BigDecimal price, String description, int quantity, LocalDateTime createdDate, LocalDateTime modifiedDate, ProductState productState) {
+    public Product(UUID productId, String name, BigDecimal price, String description, int quantity, LocalDateTime createdDate, ProductState productState) {
         this.productId = productId;
         this.name = name;
         this.price = price;
         this.description = description;
         this.quantity = quantity;
         this.createdDate = createdDate;
-        this.modifiedDate = modifiedDate;
         this.productState=productState;
     }
 
@@ -62,10 +62,6 @@ public class Product {
 
     public LocalDateTime getCreatedDate() {
         return createdDate;
-    }
-
-    public LocalDateTime getModifiedDate() {
-        return modifiedDate;
     }
 
     public List<OrderProduct> getOrders() {
@@ -104,10 +100,6 @@ public class Product {
 
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
-    }
-
-    public void setModifiedDate(LocalDateTime modifiedDate) {
-        this.modifiedDate = modifiedDate;
     }
 
     public void setOrders(List<OrderProduct> orders) {
