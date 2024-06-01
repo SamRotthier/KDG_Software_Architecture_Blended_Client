@@ -8,6 +8,8 @@ import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.domain.Product;
 import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
     public OrderService(OrderRepository orderRepository) {
@@ -32,6 +35,7 @@ public class OrderService {
     }
 
     public Order createOrder(OrderDto orderDto){
+        logger.info("Creating new order");
         Order order = new Order();
         order.setOrderId(UUID.randomUUID());
         order.setProducts(orderDto.getProducts());
@@ -46,14 +50,21 @@ public class OrderService {
     }
 
     public void confirmOrder(Optional<Order> foundOrder) {
-        foundOrder.ifPresent(order -> order.setStatus(OrderStatus.CONFIRMED));
+        foundOrder.ifPresent(order -> {
+            logger.info("Confirming order with ID: {}", order.getOrderId());
+            order.setStatus(OrderStatus.CONFIRMED);
+        });
     }
 
     public void cancelOrder(Optional<Order> foundOrder) {
-        foundOrder.ifPresent(order -> order.setStatus(OrderStatus.CANCELLED));
+        foundOrder.ifPresent(order -> {
+            logger.info("Cancelling order with ID: {}", order.getOrderId());
+            order.setStatus(OrderStatus.CANCELLED);
+        });
     }
 
     public Optional<List<Order>> getOrders(){
+        logger.info("Fetching all orders");
         return Optional.of(orderRepository.findAll());
     }
 

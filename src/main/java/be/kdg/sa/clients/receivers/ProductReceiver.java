@@ -28,7 +28,7 @@ public class ProductReceiver {
     @RabbitListener(queues = RabbitTopology.PRODUCT_STATE_QUEUE, messageConverter = "#{jackson2JsonMessageConverter}")
     public void receiveDeactivateProduct(UUID productNumber) {
         logger.info("Received a new deactivation message for product id: {}", productNumber);
-        productService.deactivateProductById(productNumber);
+        productService.changeProductStateById(productNumber);
 
     }
 }

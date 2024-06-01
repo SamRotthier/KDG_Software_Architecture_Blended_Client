@@ -24,21 +24,26 @@ public class ProductService {
     }
 
     public List<Product> getNewUnpricedProducts() {
+        logger.info("Fetching all products with no price.");
         return productRepository.getAllByPriceIsNull();
     }
 
     public Product setProductPrice(UUID id, Double price) {
+        logger.info("Setting price for product with ID {}.", id);
         Optional<Product> optionalProduct = productRepository.findById(id);
         if(optionalProduct.isPresent()){
             Product product = optionalProduct.get();
             product.setPrice(BigDecimal.valueOf(price));
+            logger.info("Price set for product with ID {}: ", id);
             return productRepository.save(product);
         } else {
-            throw new IllegalArgumentException("Product with ID" + id + "was not found");
+            logger.error("Product with ID {} was not found.", id);
+            return null;
         }
     }
 
     public void addProductFromMessage(ProductDto productDto) {
+        logger.info("Adding new product from message: {}.", productDto);
         Product product = new Product();
         product.setProductId(productDto.getProductId());
         product.setName(productDto.getName());
@@ -47,7 +52,8 @@ public class ProductService {
         logger.info("A new product was saved in the db with name: {}", product.getName());
     }
 
-    public void deactivateProductById(UUID productNumber) {
+    public void changeProductStateById(UUID productNumber) {
+        logger.info("Change state of product with ID {}.", productNumber);
         Optional<Product> optionalProduct = productRepository.getProductByProductId(productNumber);
 
         if (optionalProduct.isEmpty()) {
@@ -58,6 +64,6 @@ public class ProductService {
         Product product = optionalProduct.get();
         product.setProductState(product.getProductState()==ProductState.ACTIVE ? ProductState.INACTIVE : ProductState.ACTIVE);
         productRepository.save(product);
-
+        logger.info("Product state for ID {} was changed successfully.", productNumber);
     }
 }
