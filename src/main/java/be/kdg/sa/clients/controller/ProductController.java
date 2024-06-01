@@ -49,10 +49,8 @@ public class ProductController {
                 product.getProductId(),
                 product.getName(),
                 product.getPrice(),
-                product.getDescription(),
                 product.getQuantity(),
-                product.getCreatedDate(),
-                product.getModifiedDate()
+                product.getCreatedDate()
         );
     }
 }
