@@ -8,6 +8,7 @@ import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.domain.Product;
 import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
+import be.kdg.sa.clients.sender.RestSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,13 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
+    private final RestSender restSender;
+
 
     @Autowired
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, RestSender restSender) {
         this.orderRepository=orderRepository;
+        this.restSender = restSender;
     }
 
 
@@ -53,6 +57,7 @@ public class OrderService {
         foundOrder.ifPresent(order -> {
             logger.info("Confirming order with ID: {}", order.getOrderId());
             order.setStatus(OrderStatus.CONFIRMED);
+            restSender.sendOrder(foundOrder);
         });
     }
 
