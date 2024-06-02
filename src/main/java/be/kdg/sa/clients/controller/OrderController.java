@@ -23,6 +23,7 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderService orderService;
+
     @Autowired
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
@@ -41,7 +42,7 @@ public class OrderController {
     }
 
 
-    @PutMapping("/{orderId}/confirm") //TODO
+    @PutMapping("/{orderId}/confirm")
     public ResponseEntity<?> confirmOrder (@Valid @PathVariable UUID orderId){
         Optional<Order> foundOrder = orderService.getOrderByOrderId(orderId);
         if(foundOrder.isEmpty()){
@@ -60,7 +61,7 @@ public class OrderController {
     public ResponseEntity<?> cancelOrder (@PathVariable UUID orderId){
         Optional<Order> foundOrder = orderService.getOrderByOrderId(orderId);
         if(foundOrder.isEmpty()){
-            return ResponseEntity.badRequest().body("Invalid orderId"); //TODO
+            return ResponseEntity.badRequest().body("Invalid orderId");
         }
 
         if (foundOrder.get().getStatus() == OrderStatus.CONFIRMED || foundOrder.get().getStatus() == OrderStatus.CANCELLED){

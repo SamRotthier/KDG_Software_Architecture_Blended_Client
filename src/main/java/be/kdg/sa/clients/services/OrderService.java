@@ -82,7 +82,8 @@ public class OrderService {
         foundOrder.ifPresent(order -> {
             logger.info("Confirming order with ID: {}", order.getOrderId());
             order.setStatus(OrderStatus.CONFIRMED);
-            restSender.sendOrder(foundOrder);
+            Order orderMessage = order;
+            restSender.sendOrder(orderMessage);
         });
     }
 

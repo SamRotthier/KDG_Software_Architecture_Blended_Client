@@ -5,9 +5,18 @@ import java.util.UUID;
 public class OrderProductDto {
     private UUID id;
     private int quantity;
+    private UUID orderId;
+    private UUID productId;
 
     public OrderProductDto(UUID id, int quantity) {
         this.id = id;
+        this.quantity = quantity;
+    }
+
+    public OrderProductDto(UUID id, UUID orderId, UUID productId, int quantity) {
+        this.id = id;
+        this.orderId = orderId;
+        this.productId = productId;
         this.quantity = quantity;
     }
 

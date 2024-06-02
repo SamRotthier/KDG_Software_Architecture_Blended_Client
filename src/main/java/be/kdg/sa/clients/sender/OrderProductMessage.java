@@ -1,5 +1,6 @@
 package be.kdg.sa.clients.sender;
 
+import be.kdg.sa.clients.controller.dto.OrderProductDto;
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.OrderProduct;
@@ -13,16 +14,16 @@ import java.util.UUID;
 public class OrderProductMessage {
     private UUID orderId;
 
-    private List<OrderProduct> products;
-    private BigDecimal totalPrice;
+    private List<OrderProductDto> products;
 
+    private UUID accountId;
 
-
-    public OrderProductMessage(UUID orderId, List<OrderProduct> products, BigDecimal totalPrice) {
+    public OrderProductMessage(UUID orderId, List<OrderProductDto> products, UUID accountId) {
         this.orderId = orderId;
         this.products = products;
-        this.totalPrice = totalPrice;
+        this.accountId = accountId;
     }
+
     public OrderProductMessage() {
 
     }
@@ -31,12 +32,11 @@ public class OrderProductMessage {
         return orderId;
     }
 
-    public List<OrderProduct> getProducts() {
+    public List<OrderProductDto> getProducts() {
         return products;
     }
 
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
+    public UUID getAccountId() {
+        return accountId;
     }
-
 }

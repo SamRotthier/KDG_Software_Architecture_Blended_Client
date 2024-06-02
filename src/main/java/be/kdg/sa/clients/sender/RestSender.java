@@ -2,7 +2,9 @@ package be.kdg.sa.clients.sender;
 
 import be.kdg.sa.clients.config.RabbitTopology;
 import be.kdg.sa.clients.controller.dto.OrderDto;
+import be.kdg.sa.clients.controller.dto.OrderProductDto;
 import be.kdg.sa.clients.domain.Order;
+import be.kdg.sa.clients.domain.OrderProduct;
 import be.kdg.sa.clients.services.OrderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,13 +33,13 @@ public class RestSender {
         this.objectMapper = objectMapper;
     }
 
-    @PostMapping("/deliver/{uuid}")
-    public void sendOrder(@RequestBody Optional<Order> order) {
-        logger.info("Trying to send order message for UUID: {}", order.get().getOrderId());
+    @PostMapping("/order/{uuid}")
+    public void sendOrder(@RequestBody Order order) {
+        logger.info("Send order message for UUID: {}", order.getOrderId());
 
-        rabbitTemplate.convertAndSend(RabbitTopology.ORDER_PRODUCT_QUEUE, "order-product-queue",
-                (new OrderProductMessage(order.get().getOrderId(), order.get().getProducts(), order.get().getTotalPrice())));
-        logger.info("Delivery message was successfully posted to the ORDER_PRODUCT_QUEUE for UUID: {}",order.get().getOrderId());
+        rabbitTemplate.convertAndSend(RabbitTopology.TOPIC_EXCHANGE, "order-product-queue",
+                (new OrderProductMessage(order.getOrderId(), order.getProducts().stream().map(i -> new OrderProductDto(i.getId(), i.getOrder().getOrderId(), i.getProduct().getProductId(),i.getQuantity())).toList(), order.getAccount().getAccountId())));
+        logger.info("Order message was successfully posted to the ORDER_PRODUCT_QUEUE for UUID: {}",order.getOrderId());
     }
 
 }
