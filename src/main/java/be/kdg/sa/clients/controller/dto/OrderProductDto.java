@@ -20,6 +20,10 @@ public class OrderProductDto {
         this.quantity = quantity;
     }
 
+    public OrderProductDto() {
+
+    }
+
     public UUID getId() {
         return id;
     }
