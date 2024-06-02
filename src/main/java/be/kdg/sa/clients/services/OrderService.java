@@ -82,6 +82,7 @@ public class OrderService {
         foundOrder.ifPresent(order -> {
             logger.info("Confirming order with ID: {}", order.getOrderId());
             order.setStatus(OrderStatus.CONFIRMED);
+            orderRepository.save(order);
             Order orderMessage = order;
             restSender.sendOrder(orderMessage);
         });
@@ -90,6 +91,7 @@ public class OrderService {
     public void cancelOrder(Optional<Order> foundOrder) {
         foundOrder.ifPresent(order -> {
             logger.info("Cancelling order with ID: {}", order.getOrderId());
+            orderRepository.save(order);
             order.setStatus(OrderStatus.CANCELLED);
         });
     }
