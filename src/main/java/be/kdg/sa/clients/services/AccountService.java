@@ -3,6 +3,7 @@ package be.kdg.sa.clients.services;
 import be.kdg.sa.clients.controller.dto.AccountDto;
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.repositories.AccountRepository;
+import be.kdg.sa.clients.repositories.OrderRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +18,11 @@ import java.util.UUID;
 public class AccountService {
     private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
     private final AccountRepository accountRepository;
+    private final OrderRepository orderRepository;
 
-    @Autowired
-    public AccountService(AccountRepository accountRepository){
+    public AccountService(AccountRepository accountRepository, OrderRepository orderRepository) {
         this.accountRepository = accountRepository;
+        this.orderRepository = orderRepository;
     }
 
     public Account createAccount(AccountDto accountDto){
@@ -53,7 +55,9 @@ public class AccountService {
         logger.info("Deleting account with ID: {}", accountId);
         Account account = accountRepository.findByAccountId(accountId);
         if(account != null){
-            accountRepository.deleteByAccountId(accountId);
+            orderRepository.nullifyAccountId(account.getAccountId());
+            logger.info("Account ID for related orders was successfully nullified.");
+            accountRepository.deleteByAccountId(account.getAccountId());
             logger.info("Account with ID {} deleted successfully", accountId);
         } else {
             logger.warn("Delete failed: Account with ID {} not found", accountId);

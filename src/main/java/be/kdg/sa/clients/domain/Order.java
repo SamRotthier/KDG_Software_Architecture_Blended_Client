@@ -23,6 +23,7 @@ public class Order {
     @CreationTimestamp
     private LocalDateTime creationDateTime;
     @ManyToOne
+    @JoinColumn(name = "account_id")
     private Account account;
 
 

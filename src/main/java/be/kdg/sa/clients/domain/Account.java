@@ -92,4 +92,12 @@ public class Account {
     public void setType(AccountRelationType type) {
         this.type = type;
     }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
 }
