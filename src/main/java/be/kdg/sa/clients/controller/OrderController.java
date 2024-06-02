@@ -57,7 +57,7 @@ public class OrderController {
         }
     }
 
-    @PutMapping("/{orderid}/cancel") //TODO
+    @PutMapping("/{orderId}/cancel")
     public ResponseEntity<?> cancelOrder (@PathVariable UUID orderId){
         Optional<Order> foundOrder = orderService.getOrderByOrderId(orderId);
         if(foundOrder.isEmpty()){
@@ -65,10 +65,10 @@ public class OrderController {
         }
 
         if (foundOrder.get().getStatus() == OrderStatus.CONFIRMED || foundOrder.get().getStatus() == OrderStatus.CANCELLED){
-            return ResponseEntity.badRequest().body("We could not confirm the order. The order is already: " + foundOrder.get().getStatus());
+            return ResponseEntity.badRequest().body("We could not cancel the order. The order is already: " + foundOrder.get().getStatus());
         }else{
             orderService.cancelOrder(foundOrder);
-            return ResponseEntity.status(HttpStatus.CREATED).body("The order was confirmed");
+            return ResponseEntity.status(HttpStatus.CREATED).body("The order was cancelled");
         }
     }
 
