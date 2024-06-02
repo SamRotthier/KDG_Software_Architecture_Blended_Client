@@ -29,6 +29,9 @@ public class ProductDto {
         this.createdDate = createdDate;
     }
 
+    public ProductDto() {
+    }
+
     public UUID getProductId() {
         return productId;
     }

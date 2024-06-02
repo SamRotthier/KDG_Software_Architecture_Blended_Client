@@ -4,6 +4,7 @@ import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -14,27 +15,23 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID orderId;
-    @OneToMany
-    private List<Product> products;
+    @OneToMany(mappedBy = "order")
+    private List<OrderProduct> products;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-    private double totalPrice;
+    private BigDecimal totalPrice;
     @CreationTimestamp
     private LocalDateTime creationDateTime;
-    private LocalDateTime modifiedDateTime;
-    private LocalDateTime confirmationDateTime;
     @ManyToOne
     private Account account;
 
 
-    public Order(UUID orderId, List<Product> products, OrderStatus status, double totalPrice, LocalDateTime creationDateTime, LocalDateTime modifiedDateTime, LocalDateTime confirmationDateTime, Account account) {
+    public Order(UUID orderId, List<OrderProduct> products, OrderStatus status, BigDecimal totalPrice, LocalDateTime creationDateTime, Account account) {
         this.orderId = orderId;
         this.products = products;
         this.status = status;
         this.totalPrice = totalPrice;
         this.creationDateTime = creationDateTime;
-        this.modifiedDateTime = modifiedDateTime;
-        this.confirmationDateTime = confirmationDateTime;
         this.account = account;
     }
     public Order() {
@@ -45,7 +42,7 @@ public class Order {
         return orderId;
     }
 
-    public List<Product> getProducts() {
+    public List<OrderProduct> getProducts() {
         return products;
     }
 
@@ -53,20 +50,12 @@ public class Order {
         return status;
     }
 
-    public double getTotalPrice() {
+    public BigDecimal getTotalPrice() {
         return totalPrice;
     }
 
     public LocalDateTime getCreationDateTime() {
         return creationDateTime;
-    }
-
-    public LocalDateTime getModifiedDateTime() {
-        return modifiedDateTime;
-    }
-
-    public LocalDateTime getConfirmationDateTime() {
-        return confirmationDateTime;
     }
 
     public Account getAccount() {
@@ -77,7 +66,7 @@ public class Order {
         this.orderId = orderId;
     }
 
-    public void setProducts(List<Product> products) {
+    public void setProducts(List<OrderProduct> products) {
         this.products = products;
     }
 
@@ -85,20 +74,12 @@ public class Order {
         this.status = status;
     }
 
-    public void setTotalPrice(double totalPrice) {
+    public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }
 
     public void setCreationDateTime(LocalDateTime creationDateTime) {
         this.creationDateTime = creationDateTime;
-    }
-
-    public void setModifiedDateTime(LocalDateTime modifiedDateTime) {
-        this.modifiedDateTime = modifiedDateTime;
-    }
-
-    public void setConfirmationDateTime(LocalDateTime confirmationDateTime) {
-        this.confirmationDateTime = confirmationDateTime;
     }
 
     public void setAccount(Account account) {

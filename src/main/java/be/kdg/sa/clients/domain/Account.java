@@ -3,6 +3,7 @@ package be.kdg.sa.clients.domain;
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
 import jakarta.persistence.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -20,6 +21,10 @@ public class Account {
 
     @Enumerated(EnumType.STRING)
     private AccountRelationType type;
+
+    @OneToMany(mappedBy = "account")
+    private List<Order> orders;
+
     public Account() {
     }
 
@@ -65,23 +70,14 @@ public class Account {
         this.accountId = accountId;
     }
     public void setLastName(String lastName) {
-        if(lastName == null || lastName.equals("")){
-            throw new IllegalArgumentException("Enter a name.");
-        }
         this.lastName = lastName;
     }
 
     public void setFirstName(String firstName) {
-        if(firstName == null || firstName.equals("")){
-            throw new IllegalArgumentException("Enter a name.");
-        }
         this.firstName = firstName;
     }
 
     public void setEmail(String email) {
-        if (email == null || !email.matches("^[\\w.-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-            throw new IllegalArgumentException("Invalid email format");
-        }
         this.email = email;
     }
 
@@ -90,16 +86,10 @@ public class Account {
     }
 
     public void setPoints(int points) {
-        if(points < 0){
-            throw new IllegalArgumentException("Enter a valid amount of points.");
-        }
         this.points = points;
     }
 
     public void setType(AccountRelationType type) {
-        if(type == null){
-            throw new IllegalArgumentException("No type account relation type was declared");
-        }
         this.type = type;
     }
 }

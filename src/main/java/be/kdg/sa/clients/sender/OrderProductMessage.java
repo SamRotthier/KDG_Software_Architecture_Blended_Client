@@ -2,8 +2,10 @@ package be.kdg.sa.clients.sender;
 
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
+import be.kdg.sa.clients.domain.OrderProduct;
 import be.kdg.sa.clients.domain.Product;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -11,12 +13,12 @@ import java.util.UUID;
 public class OrderProductMessage {
     private UUID orderId;
 
-    private List<Product> products;
-    private double totalPrice;
+    private List<OrderProduct> products;
+    private BigDecimal totalPrice;
 
 
 
-    public OrderProductMessage(UUID orderId, List<Product> products, double totalPrice) {
+    public OrderProductMessage(UUID orderId, List<OrderProduct> products, BigDecimal totalPrice) {
         this.orderId = orderId;
         this.products = products;
         this.totalPrice = totalPrice;
@@ -29,11 +31,11 @@ public class OrderProductMessage {
         return orderId;
     }
 
-    public List<Product> getProducts() {
+    public List<OrderProduct> getProducts() {
         return products;
     }
 
-    public double getTotalPrice() {
+    public BigDecimal getTotalPrice() {
         return totalPrice;
     }
 

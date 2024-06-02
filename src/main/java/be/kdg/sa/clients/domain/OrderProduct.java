@@ -10,18 +10,20 @@ public class OrderProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @ManyToOne
-    private Product product;
+
     @ManyToOne
     private Order order;
+
+    @ManyToOne
+    private Product product;
     private int quantity;
 
     public OrderProduct() {
     }
 
-    public OrderProduct(Product product, Order order, int quantity) {
-        this.product = product;
+    public OrderProduct(Order order, Product product, int quantity) {
         this.order = order;
+        this.product = product;
         this.quantity = quantity;
     }
 
