@@ -47,6 +47,7 @@ public class ProductService {
         Product product = new Product();
         product.setProductId(productDto.getProductId());
         product.setName(productDto.getName());
+        product.setProductState(ProductState.INACTIVE);
 
         productRepository.save(product);
         logger.info("A new product was saved in the db with name: {}", product.getName());

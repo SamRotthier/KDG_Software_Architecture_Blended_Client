@@ -39,4 +39,20 @@ public class OrderProductDto {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    public UUID getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(UUID orderId) {
+        this.orderId = orderId;
+    }
+
+    public UUID getProductId() {
+        return productId;
+    }
+
+    public void setProductId(UUID productId) {
+        this.productId = productId;
+    }
 }

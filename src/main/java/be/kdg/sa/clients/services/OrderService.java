@@ -5,6 +5,7 @@ import be.kdg.sa.clients.controller.dto.OrderDto;
 import be.kdg.sa.clients.controller.dto.OrderProductDto;
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
+import be.kdg.sa.clients.domain.Enum.ProductState;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.domain.OrderProduct;
 import be.kdg.sa.clients.domain.Product;
@@ -64,7 +65,7 @@ public class OrderService {
         List<OrderProductDto> products = orderDto.getProducts();
 
         //Total Price
-        BigDecimal totalPrice = products.stream().filter(i -> i.getId() != null).map(p -> productRepository.findPriceByProductId(p.getId()).multiply(BigDecimal.valueOf(p.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalPrice = products.stream().filter(i -> i.getId() != null && isProductActive(i.getId())).map(p -> productRepository.findPriceByProductId(p.getId()).multiply(BigDecimal.valueOf(p.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
         order.setTotalPrice(totalPrice);
         Order savedOrder = orderRepository.save(order);
         logger.info("Order saved with Id: {}", order.getOrderId());
@@ -72,7 +73,7 @@ public class OrderService {
         //Link products to order
         if(products != null){
             logger.info("Saving order products: {}", products);
-            orderProductRepository.saveAll(products.stream().filter(i -> i.getId() != null).map(i -> new OrderProduct(savedOrder, productRepository.findById(i.getId()).orElseThrow(), i.getQuantity())).toList());
+            orderProductRepository.saveAll(products.stream().filter(i -> i.getId() != null && isProductActive(i.getId())).map(i -> new OrderProduct(savedOrder, productRepository.findById(i.getId()).orElseThrow(), i.getQuantity())).toList());
         }
 
         return savedOrder;
@@ -82,6 +83,7 @@ public class OrderService {
         foundOrder.ifPresent(order -> {
             logger.info("Confirming order with ID: {}", order.getOrderId());
             order.setStatus(OrderStatus.CONFIRMED);
+            orderRepository.save(order);
             Order orderMessage = order;
             restSender.sendOrder(orderMessage);
         });
@@ -97,6 +99,12 @@ public class OrderService {
     public Optional<List<Order>> getOrders(){
         logger.info("Fetching all orders");
         return Optional.of(orderRepository.findAll());
+    }
+
+    private boolean isProductActive(UUID productId) {
+        return productRepository.findById(productId)
+                .map(product -> product.getProductState() == ProductState.ACTIVE)
+                .orElse(false);
     }
 
 }

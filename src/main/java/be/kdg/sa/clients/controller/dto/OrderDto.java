@@ -17,19 +17,19 @@ public class OrderDto {
     private double totalPrice;
     private LocalDateTime creationDateTime;
 
-    private UUID accountid;
+    private UUID accountId;
 
 
-    public OrderDto(List<OrderProductDto> products, OrderStatus status, double totalPrice, UUID accountid) {
+    public OrderDto(List<OrderProductDto> products, OrderStatus status, double totalPrice, UUID accountId) {
         this.products = products;
         this.status = status;
         this.totalPrice = totalPrice;
-        this.accountid = accountid;
+        this.accountId = accountId;
     }
 
-    public OrderDto(List<OrderProductDto> products, UUID accountid) {
+    public OrderDto(List<OrderProductDto> products, UUID accountId) {
         this.products = products;
-        this.accountid = accountid;
+        this.accountId = accountId;
     }
 
     public OrderDto() {
@@ -57,7 +57,7 @@ public class OrderDto {
     }
 
     public UUID getAccountId() {
-        return accountid;
+        return accountId;
     }
 
     public void setOrderId(UUID orderId) {
@@ -80,8 +80,8 @@ public class OrderDto {
         this.creationDateTime = creationDateTime;
     }
 
-    public void setAccountId(UUID accountid) {
-        this.accountid = accountid;
+    public void setAccountId(UUID accountId) {
+        this.accountId = accountId;
     }
 
 }

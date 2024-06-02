@@ -37,8 +37,23 @@ public class RestSender {
     public void sendOrder(@RequestBody Order order) {
         logger.info("Send order message for UUID: {}", order.getOrderId());
 
+        //debug
+        List<OrderProduct> productsList = order.getProducts();
+        for (OrderProduct product : productsList) {
+            System.out.println("ID: " + product.getId() + ", ProductId: " + product.getProduct().getProductId() + ", OrderId: "+ product.getOrder().getOrderId() + ", Quantity: " + product.getQuantity());
+        }
+
+        //message
+        OrderProductMessage message = new OrderProductMessage(order.getOrderId(), order.getProducts().stream().map(i -> new OrderProductDto(i.getId(), i.getOrder().getOrderId(), i.getProduct().getProductId(),i.getQuantity())).toList(), order.getAccount().getAccountId());
+
         rabbitTemplate.convertAndSend(RabbitTopology.TOPIC_EXCHANGE, "order-product-queue",
-                (new OrderProductMessage(order.getOrderId(), order.getProducts().stream().map(i -> new OrderProductDto(i.getId(), i.getOrder().getOrderId(), i.getProduct().getProductId(),i.getQuantity())).toList(), order.getAccount().getAccountId())));
+                message);
+
+        //debug
+        for (OrderProductDto product : message.getProducts()) {
+            System.out.println("ID: " + product.getId() + ", ProductId: " + product.getProductId() + ", OrderId: "+ product.getOrderId() + ", Quantity: " + product.getQuantity());
+        }
+
         logger.info("Order message was successfully posted to the ORDER_PRODUCT_QUEUE for UUID: {}",order.getOrderId());
     }
 
