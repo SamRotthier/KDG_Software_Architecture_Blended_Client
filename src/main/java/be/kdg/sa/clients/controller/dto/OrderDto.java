@@ -20,14 +20,18 @@ public class OrderDto {
     private UUID accountid;
 
 
-    public OrderDto(UUID orderId, List<OrderProductDto> products, OrderStatus status, double totalPrice, LocalDateTime creationDateTime, UUID accountid) {
-        this.orderId = orderId;
+    public OrderDto(List<OrderProductDto> products, OrderStatus status, double totalPrice, UUID accountid) {
         this.products = products;
         this.status = status;
         this.totalPrice = totalPrice;
-        this.creationDateTime = creationDateTime;
         this.accountid = accountid;
     }
+
+    public OrderDto(List<OrderProductDto> products, UUID accountid) {
+        this.products = products;
+        this.accountid = accountid;
+    }
+
     public OrderDto() {
 
     }

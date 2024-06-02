@@ -17,4 +17,5 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     @Query("SELECT p.price FROM Product p WHERE p.productId = :productId")
     BigDecimal findPriceByProductId(UUID productId);
 
+    List<Product> getAllByPriceIsNotNull();
 }

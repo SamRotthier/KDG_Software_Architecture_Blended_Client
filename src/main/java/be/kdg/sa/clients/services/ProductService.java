@@ -66,4 +66,9 @@ public class ProductService {
         productRepository.save(product);
         logger.info("Product state for ID {} was changed successfully.", productNumber);
     }
+
+    public List<Product> getPricedProducts() {
+        logger.info("Fetching all products with price.");
+        return productRepository.getAllByPriceIsNotNull();
+    }
 }

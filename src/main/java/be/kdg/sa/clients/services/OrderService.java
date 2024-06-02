@@ -13,6 +13,7 @@ import be.kdg.sa.clients.repositories.OrderProductRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
 import be.kdg.sa.clients.repositories.ProductRepository;
 import be.kdg.sa.clients.sender.RestSender;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,33 +47,33 @@ public class OrderService {
         return orderRepository.findOrderByOrderId(givenOrderId);
     }
 
+    @Transactional
     public Order createOrder(OrderDto orderDto){
         logger.info("Creating new order");
 
         //get Account
-        Account account = accountRepository.findById(orderDto.getAccountId()).orElseThrow();
+        Account account = accountRepository.findByAccountId(orderDto.getAccountId());
+        logger.info(String.valueOf(account));
 
         //create order
         Order order = new Order();
         order.setOrderId(UUID.randomUUID());
-        order.setStatus(orderDto.getStatus());
-        order.setCreationDateTime(orderDto.getCreationDateTime());
+        order.setStatus(OrderStatus.PENDING);
         order.setAccount(account);
-        Order savedOrder = orderRepository.save(order);
-        logger.info("Order saved with Id: {}", savedOrder.getOrderId());
 
-        //Link products to order
         List<OrderProductDto> products = orderDto.getProducts();
 
+        //Total Price
+        BigDecimal totalPrice = products.stream().filter(i -> i.getId() != null).map(p -> productRepository.findPriceByProductId(p.getId()).multiply(BigDecimal.valueOf(p.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        order.setTotalPrice(totalPrice);
+        Order savedOrder = orderRepository.save(order);
+        logger.info("Order saved with Id: {}", order.getOrderId());
+
+        //Link products to order
         if(products != null){
             logger.info("Saving order products: {}", products);
             orderProductRepository.saveAll(products.stream().filter(i -> i.getId() != null).map(i -> new OrderProduct(savedOrder, productRepository.findById(i.getId()).orElseThrow(), i.getQuantity())).toList());
         }
-
-        //Total Price
-        BigDecimal totalPrice = products.stream().filter(i -> i.getId() != null).map(p -> productRepository.findPriceByProductId(p.getId()).multiply(BigDecimal.valueOf(p.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
-        savedOrder.setTotalPrice(totalPrice);
-        orderRepository.save(savedOrder);
 
         return savedOrder;
     }

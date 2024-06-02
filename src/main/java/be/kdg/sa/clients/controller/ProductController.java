@@ -34,6 +34,15 @@ public class ProductController {
 
     }
 
+    @GetMapping("/")
+    public ResponseEntity<List<ProductDto>> getPricedProducts(){
+        List<Product> pricedProducts = productService.getPricedProducts();
+        if(pricedProducts.isEmpty()){
+            return ResponseEntity.noContent().build();
+        } List<ProductDto> pricedProductList = pricedProducts.stream().map(this::convertToDto).toList();
+        return ResponseEntity.ok(pricedProductList);
+    }
+
     @PatchMapping("/{productId}/price")
     public ResponseEntity<ProductDto> setProductPrice(@Valid @PathVariable("productId") UUID id, @RequestParam Double price){
         Product product = productService.setProductPrice(id, price);
@@ -49,7 +58,6 @@ public class ProductController {
                 product.getProductId(),
                 product.getName(),
                 product.getPrice(),
-                product.getQuantity(),
                 product.getCreatedDate()
         );
     }

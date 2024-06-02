@@ -11,15 +11,13 @@ public class ProductDto {
     private UUID productId;
     private String name;
     private BigDecimal price;
-    private int quantity;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    public ProductDto(UUID productId, String name, BigDecimal price, int quantity, LocalDateTime createdDate) {
+    public ProductDto(UUID productId, String name, BigDecimal price, LocalDateTime createdDate) {
         this.productId = productId;
         this.name = name;
         this.price = price;
-        this.quantity = quantity;
         this.createdDate = createdDate;
     }
 
@@ -44,10 +42,6 @@ public class ProductDto {
         return price;
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
@@ -66,10 +60,6 @@ public class ProductDto {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 
     public void setCreatedDate(LocalDateTime createdDate) {

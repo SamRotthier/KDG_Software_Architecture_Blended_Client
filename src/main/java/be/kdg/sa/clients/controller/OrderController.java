@@ -28,7 +28,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping("/")
+    @GetMapping("/") //TODO
     public ResponseEntity<?> getOrders (){
         Optional<List<Order>> foundOrders = orderService.getOrders();
         return foundOrders.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
@@ -41,7 +41,7 @@ public class OrderController {
     }
 
 
-    @PutMapping("/{orderid}/confirm") //TODO
+    @PutMapping("/{orderId}/confirm") //TODO
     public ResponseEntity<?> confirmOrder (@Valid @PathVariable UUID orderId){
         Optional<Order> foundOrder = orderService.getOrderByOrderId(orderId);
         if(foundOrder.isEmpty()){
