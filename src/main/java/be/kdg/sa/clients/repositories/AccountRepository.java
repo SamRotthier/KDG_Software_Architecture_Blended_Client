@@ -11,9 +11,7 @@ import java.util.UUID;
 public interface AccountRepository extends JpaRepository<Account, UUID> {
 
     Account findByAccountId(UUID accountId);
-    Integer deleteByAccountId(UUID accountId);
-
+    void deleteByAccountId(UUID accountId);
     Optional<Account> findAccountByLastName(String lastName);
-
     boolean existsByEmail(String email);
 }
