@@ -36,8 +36,14 @@ public class OrderController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createOrder (@Valid @RequestBody OrderDto orderDto, BindingResult bindingResult){
+    public ResponseEntity<?> createOrder (@Valid @RequestBody OrderDto orderDto){
         orderService.createOrder(orderDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("The order was successfully created");
+    }
+
+    @PostMapping("/{orderId}/create")
+    public ResponseEntity<?> createCopyOrder (@Valid @PathVariable UUID orderId){
+       orderService.createCopyOrder(orderId);
         return ResponseEntity.status(HttpStatus.CREATED).body("The order was successfully created");
     }
 
