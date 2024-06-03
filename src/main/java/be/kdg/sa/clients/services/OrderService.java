@@ -62,18 +62,24 @@ public class OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setAccount(account);
 
-        List<OrderProductDto> products = orderDto.getProducts();
+        // Filter on active products
+        List<OrderProductDto> activeProducts = orderDto.getProducts().stream().filter(p -> isProductActive(p.getProductId())).toList();
+        UUID testId = activeProducts.stream().findFirst().orElse(new OrderProductDto()).getProductId();
+        if (testId == null) {
+            logger.warn("No active products found in the order with ID: {}", orderDto.getOrderId());
+        }
 
         //Total Price
-        BigDecimal totalPrice = products.stream().filter(i -> i.getId() != null && isProductActive(i.getId())).map(p -> productRepository.findPriceByProductId(p.getId()).multiply(BigDecimal.valueOf(p.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        logger.info("Calculate total price");
+        BigDecimal totalPrice = activeProducts.stream().filter(i -> i.getProductId() != null).map(p -> productRepository.findPriceByProductId(p.getProductId()).multiply(BigDecimal.valueOf(p.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
         order.setTotalPrice(totalPrice);
         Order savedOrder = orderRepository.save(order);
         logger.info("Order saved with Id: {}", order.getOrderId());
 
-        //Link products to order
-        if(products != null){
-            logger.info("Saving order products: {}", products);
-            orderProductRepository.saveAll(products.stream().filter(i -> i.getId() != null && isProductActive(i.getId())).map(i -> new OrderProduct(savedOrder, productRepository.findById(i.getId()).orElseThrow(), i.getQuantity())).toList());
+        //Link active products to order
+        if(testId != null){
+            logger.info("Saving order activeProducts: {}", activeProducts);
+            orderProductRepository.saveAll(activeProducts.stream().filter(i -> i.getProductId() != null).map(i -> new OrderProduct(savedOrder, productRepository.findById(i.getProductId()).orElseThrow(), i.getQuantity())).toList());
         }
 
         return savedOrder;
