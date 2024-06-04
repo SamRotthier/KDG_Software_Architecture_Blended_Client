@@ -1,10 +1,11 @@
-package be.kdg.sa.clients.controller;
+package be.kdg.sa.clients.services;
 
 import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderProductRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
 import be.kdg.sa.clients.repositories.ProductRepository;
-import be.kdg.sa.clients.services.ProductService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,53 +14,50 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class OrderControllerTest {
-    private static final Logger logger = LoggerFactory.getLogger(OrderControllerTest.class);
+class OrderServiceTest {
 
-    private static final UUID order_id = UUID.randomUUID();
+    private static final Logger logger = LoggerFactory.getLogger(OrderServiceTest.class);
 
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private OrderProductRepository orderProductRepository;
-    @Autowired
-    private AccountRepository accountRepository;
     @Autowired
     private ProductService productService;
 
     @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderProductRepository orderProductRepository;
+
+    @Autowired
     private MockMvc mockMvc;
 
+    @BeforeEach
+    public void setUp(){
 
+    }
+
+    @AfterEach
+    public void tearDown(){
+
+    }
     @Test
-    void getOrders() {
+    void createOrderIncludingCalculaltingTheTotalPriceShouldSucceed() {
     }
 
     @Test
-    void createOrder() {
-    }
+    void calculateTotalPriceTest(){
 
-    @Test
-    void createCopyOrder() {
-    }
-
-    @Test
-    void confirmOrder() {
-    }
-
-    @Test
-    void cancelOrder() {
-    }
-
-    @Test
-    void getOrder() {
     }
 }

@@ -67,13 +67,13 @@ class ProductControllerTest {
 
     @Test
     //@WithMockUser(authorities = "admin") (vergeet uw dependency niet toe te voegen)
-    public void getNewUnpricedProducts() throws Exception {
+    public void gettingAllNewUnpricedProductsShouldBeOkForAdmin() throws Exception {
         mockMvc.perform(get("/products/new").accept(APPLICATION_JSON)).andExpect(status().isOk()).andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON.toString())).andDo(result -> logger.info(result.getResponse().getContentAsString()));
     }
 
-   /* @Test
+   @Test
         //@WithMockUser(authorities = "admin") (vergeet uw dependency niet toe te voegen)
-    void setProductPrice() throws Exception{
+    void settingProductPriceShouldBeOkForAdmin() throws Exception{
         mockMvc.perform(patch("/products/{product}/price", product_id)
                         .accept(APPLICATION_JSON)
                         .param("price", "3.45"))
@@ -84,11 +84,11 @@ class ProductControllerTest {
 
     @Test
         //@WithMockUser(authorities = "admin") (vergeet uw dependency niet toe te voegen)
-    void getPricedProducts() throws Exception {
+    void gettingAllPricedProductsShouldBeOkForAdmin() throws Exception {
         mockMvc.perform(get("/").accept(APPLICATION_JSON)).andExpect(status()
                 .isOk()).andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON
                 .toString())).andDo(result -> logger.info(result.getResponse()
                 .getContentAsString()));
 
-    }*/
+    }
 }
