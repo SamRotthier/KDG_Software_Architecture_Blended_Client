@@ -1,6 +1,8 @@
 package be.kdg.sa.clients.controller.dto;
 
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -13,9 +15,13 @@ public class AccountDto {
     @NotNull
     @NotEmpty
     private String firstName;
+    @Email
     @NotNull
     @NotEmpty
     private String email;
+
+    @NotBlank
+    private String password;
 
     private String company;
 
@@ -24,13 +30,15 @@ public class AccountDto {
     public AccountDto() {
     }
 
-    public AccountDto(String lastName, String firstName, String email, String company, AccountRelationType type) {
+    public AccountDto(String lastName, String firstName, String email, String password, String company, AccountRelationType type) {
         this.lastName = lastName;
         this.firstName = firstName;
         this.email = email;
+        this.password = password;
         this.company = company;
         this.type = type;
     }
+
     public String getLastName() {
         return lastName;
     }
@@ -71,4 +79,11 @@ public class AccountDto {
         this.type = type;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
