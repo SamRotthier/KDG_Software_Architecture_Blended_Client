@@ -2,6 +2,7 @@ package be.kdg.sa.clients.controller;
 
 import be.kdg.sa.clients.controller.dto.AccountDto;
 import be.kdg.sa.clients.domain.Account;
+import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.services.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,5 +50,15 @@ public class AccountController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/{accountId}/history")
+    public ResponseEntity<?> getHistoryByAccountId(@PathVariable ("accountId") UUID accountId){
+        if(accountId == null || !accountService.exists(accountId)){
+            return ResponseEntity.badRequest().body("Invalid request body");
+        }
+        List<Order> history = accountService.getAccountHistory(accountId);
+        return ResponseEntity.status(HttpStatus.OK).body(history);
+    }
+
 
 }

@@ -2,6 +2,7 @@ package be.kdg.sa.clients.services;
 
 import be.kdg.sa.clients.controller.dto.AccountDto;
 import be.kdg.sa.clients.domain.Account;
+import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
 import jakarta.transaction.Transactional;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -72,5 +74,10 @@ public class AccountService {
     public Optional<Account> getAccountByLastName(String lastName) {
         logger.info("Fetching account with last name: {}", lastName);
         return accountRepository.findAccountByLastName(lastName);
+    }
+
+    public List<Order> getAccountHistory(UUID accountId) {
+        //TODO dit geeft nog een infinite lijst terug. Bekijken hoe dit op te lossen.
+        return orderRepository.findAllByAccountId(accountId);
     }
 }

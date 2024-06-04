@@ -1,6 +1,5 @@
 package be.kdg.sa.clients.services;
 
-import be.kdg.sa.clients.controller.dto.AccountDto;
 import be.kdg.sa.clients.controller.dto.OrderDto;
 import be.kdg.sa.clients.controller.dto.OrderProductDto;
 import be.kdg.sa.clients.domain.Account;
@@ -8,7 +7,6 @@ import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.Enum.ProductState;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.domain.OrderProduct;
-import be.kdg.sa.clients.domain.Product;
 import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderProductRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
@@ -17,10 +15,10 @@ import be.kdg.sa.clients.sender.RestSender;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -114,4 +112,19 @@ public class OrderService {
                 .orElse(false);
     }
 
+    public void createCopyOrder(UUID orderId) {
+        logger.info("Copying old order");
+
+        Optional<Order> orderToCopy = orderRepository.findOrderByOrderId(orderId);
+
+        //create order
+        Order order = new Order();
+        order.setOrderId(UUID.randomUUID());
+        order.setStatus(OrderStatus.PENDING);
+        order.setAccount(orderToCopy.get().getAccount());
+        order.setProducts(orderToCopy.get().getProducts()); //TODO Misschien nog nakijken of alle orders nog actief staan
+        order.setTotalPrice(orderToCopy.get().getTotalPrice()); //TODO misschien moet dit nagegeken worden aangezien de persoon ineens in een andere korting category kan zitten
+
+        orderRepository.save(order);
+    }
 }
