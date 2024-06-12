@@ -4,6 +4,7 @@ import be.kdg.sa.clients.controller.dto.ProductDto;
 import be.kdg.sa.clients.domain.Enum.ProductState;
 import be.kdg.sa.clients.domain.Product;
 import be.kdg.sa.clients.repositories.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class ProductService {
         return productRepository.getAllByPriceIsNull();
     }
 
+    @Transactional
     public Product setProductPrice(UUID id, Double price) {
         logger.info("Setting price for product with ID {}.", id);
         Optional<Product> optionalProduct = productRepository.findById(id);
@@ -42,6 +44,7 @@ public class ProductService {
         }
     }
 
+    @Transactional
     public void addProductFromMessage(ProductDto productDto) {
         logger.info("Adding new product from message: {}.", productDto);
         Product product = new Product();
@@ -53,6 +56,7 @@ public class ProductService {
         logger.info("A new product was saved in the db with name: {}", product.getName());
     }
 
+    @Transactional
     public void changeProductStateById(UUID productNumber) {
         logger.info("Change state of product with ID {}.", productNumber);
         Optional<Product> optionalProduct = productRepository.getProductByProductId(productNumber);

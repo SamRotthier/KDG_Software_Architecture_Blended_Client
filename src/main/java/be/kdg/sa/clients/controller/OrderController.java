@@ -29,10 +29,10 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping("/") //TODO
+    @GetMapping("/")
     public ResponseEntity<?> getOrders (){
-        Optional<List<Order>> foundOrders = orderService.getOrders();
-        return foundOrders.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        List<Order> foundOrders = orderService.getOrders();
+        return ResponseEntity.ok(foundOrders);
     }
 
     @PostMapping("/create")

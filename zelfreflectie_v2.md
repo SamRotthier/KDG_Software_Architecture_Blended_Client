@@ -115,4 +115,15 @@ _eventuele vragen voor je coach_
 ## Post coaching
 
 ### Feedback  
+- TODOs er nog uit
+- Debug system print eruit
+- @Transactional bij POST/PUT operations (niet bij GET)
+- Save cancel order niet correct
+- Optional niet nodig als je een collectie/lijst ophaalt. Indien geen gevonden, geeft hij een lege lijst terug. Enkel bij individueel object optional
+- Logica bij OrderController: confirm order (check if possible = business logica => maak bv een custom exception of steek in Service)
+- Testing niet volledig
+- Bij KeyCloak niet een volledige login page die tevoorschijnkomt. Persoon moet zelf naar login page gaan.
+- Testing page
+- Loyaliteit
+- Uitbreidingen zijn verplicht
   

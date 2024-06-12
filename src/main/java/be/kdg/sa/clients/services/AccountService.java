@@ -27,6 +27,7 @@ public class AccountService {
         this.orderRepository = orderRepository;
     }
 
+    @Transactional
     public Account createAccount(AccountDto accountDto){
         logger.info("Creating account for email: {}", accountDto.getEmail());
         // TODO
@@ -77,7 +78,6 @@ public class AccountService {
     }
 
     public List<Order> getAccountHistory(UUID accountId) {
-        //TODO dit geeft nog een infinite lijst terug. Bekijken hoe dit op te lossen.
         return orderRepository.findAllByAccountId(accountId);
     }
 }

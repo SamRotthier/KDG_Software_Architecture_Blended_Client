@@ -83,6 +83,7 @@ public class OrderService {
         return savedOrder;
     }
 
+    @Transactional
     public void confirmOrder(Optional<Order> foundOrder) {
         foundOrder.ifPresent(order -> {
             logger.info("Confirming order with ID: {}", order.getOrderId());
@@ -93,17 +94,18 @@ public class OrderService {
         });
     }
 
+    @Transactional
     public void cancelOrder(Optional<Order> foundOrder) {
         foundOrder.ifPresent(order -> {
             logger.info("Cancelling order with ID: {}", order.getOrderId());
-            orderRepository.save(order);
             order.setStatus(OrderStatus.CANCELLED);
+            orderRepository.save(order);
         });
     }
 
-    public Optional<List<Order>> getOrders(){
+    public List<Order> getOrders(){
         logger.info("Fetching all orders");
-        return Optional.of(orderRepository.findAll());
+        return orderRepository.findAll();
     }
 
     private boolean isProductActive(UUID productId) {
@@ -112,6 +114,7 @@ public class OrderService {
                 .orElse(false);
     }
 
+    @Transactional
     public void createCopyOrder(UUID orderId) {
         logger.info("Copying old order");
 
