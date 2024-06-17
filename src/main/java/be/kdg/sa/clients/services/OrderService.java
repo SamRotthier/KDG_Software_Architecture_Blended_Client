@@ -3,6 +3,7 @@ package be.kdg.sa.clients.services;
 import be.kdg.sa.clients.controller.dto.OrderDto;
 import be.kdg.sa.clients.controller.dto.OrderProductDto;
 import be.kdg.sa.clients.domain.Account;
+import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.Enum.ProductState;
 import be.kdg.sa.clients.domain.Order;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,14 +33,16 @@ public class OrderService {
     private final OrderProductRepository orderProductRepository;
     private final ProductRepository productRepository;
     private final AccountRepository accountRepository;
+    private final AccountService accountService;
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
     private RestSender restSender;
 
-    public OrderService(OrderRepository orderRepository, OrderProductRepository orderProductRepository, ProductRepository productRepository, AccountRepository accountRepository, RestSender restSender) {
+    public OrderService(OrderRepository orderRepository, OrderProductRepository orderProductRepository, ProductRepository productRepository, AccountRepository accountRepository, AccountService accountService, RestSender restSender) {
         this.orderRepository = orderRepository;
         this.orderProductRepository = orderProductRepository;
         this.productRepository = productRepository;
         this.accountRepository = accountRepository;
+        this.accountService = accountService;
         this.restSender = restSender;
     }
 
@@ -70,6 +74,19 @@ public class OrderService {
         //Total Price
         logger.info("Calculate total price");
         BigDecimal totalPrice = activeProducts.stream().filter(i -> i.getProductId() != null).map(p -> productRepository.findPriceByProductId(p.getProductId()).multiply(BigDecimal.valueOf(p.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        //Check discount
+        logger.info("Checking and calculating discount");
+        order.setLoyaltyLevel(account.getLoyaltyLevel());
+        double discount = LoyaltyLevel.getDiscount(account.getPoints());
+        if(discount != 0.00){
+            BigDecimal totalDiscount = totalPrice.multiply(BigDecimal.valueOf(discount));
+            totalPrice.subtract(totalDiscount);
+            order.setTotalDiscount(totalDiscount);
+        } else{
+            order.setTotalDiscount(BigDecimal.ZERO);
+        }
+
         order.setTotalPrice(totalPrice);
         Order savedOrder = orderRepository.save(order);
         logger.info("Order saved with Id: {}", order.getOrderId());
@@ -79,6 +96,10 @@ public class OrderService {
             logger.info("Saving order activeProducts: {}", activeProducts);
             orderProductRepository.saveAll(activeProducts.stream().filter(i -> i.getProductId() != null).map(i -> new OrderProduct(savedOrder, productRepository.findById(i.getProductId()).orElseThrow(), i.getQuantity())).toList());
         }
+
+        //Update account
+        int calculatedPoints = totalPrice.divide(BigDecimal.TEN, RoundingMode.DOWN).intValue();
+        accountService.updateLoyaltyPointsAndLevel(account.getAccountId(), calculatedPoints);
 
         return savedOrder;
     }

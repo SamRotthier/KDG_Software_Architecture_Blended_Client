@@ -1,6 +1,7 @@
 package be.kdg.sa.clients.domain;
 
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
+import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public class Account {
     private String email;
     private String company;
     private int points;
+    @Enumerated(EnumType.STRING)
+    private LoyaltyLevel loyaltyLevel;
 
     @Enumerated(EnumType.STRING)
     private AccountRelationType type;
@@ -28,7 +31,7 @@ public class Account {
     public Account() {
     }
 
-    public Account(UUID accountId, String lastName, String firstName, String email, String company, int points, AccountRelationType type) {
+    public Account(UUID accountId, String lastName, String firstName, String email, String company, int points, AccountRelationType type, LoyaltyLevel loyaltyLevel) {
         this.accountId = accountId;
         this.lastName = lastName;
         this.firstName = firstName;
@@ -36,6 +39,7 @@ public class Account {
         this.company = company;
         this.points = points;
         this.type = type;
+        this.loyaltyLevel = LoyaltyLevel.BRONZE;
     }
 
 
@@ -99,5 +103,13 @@ public class Account {
 
     public void setOrders(List<Order> orders) {
         this.orders = orders;
+    }
+
+    public LoyaltyLevel getLoyaltyLevel() {
+        return loyaltyLevel;
+    }
+
+    public void setLoyaltyLevel(LoyaltyLevel loyaltyLevel) {
+        this.loyaltyLevel = loyaltyLevel;
     }
 }

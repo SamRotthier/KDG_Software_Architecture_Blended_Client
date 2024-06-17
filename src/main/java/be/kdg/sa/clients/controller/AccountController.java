@@ -1,6 +1,7 @@
 package be.kdg.sa.clients.controller;
 
 import be.kdg.sa.clients.controller.dto.AccountDto;
+import be.kdg.sa.clients.controller.dto.LoyaltyDto;
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.services.AccountService;
@@ -60,6 +61,17 @@ public class AccountController {
         }
         List<Order> history = accountService.getAccountHistory(accountId);
         return ResponseEntity.status(HttpStatus.OK).body(history);
+    }
+
+
+    @GetMapping("/{accountId}/loyalty")
+    public ResponseEntity<?> getLoyaltyByAccountId(@PathVariable("accountId") UUID accountId){
+        LoyaltyDto loyaltyDto = accountService.getLoyaltyByAccountId(accountId);
+        if(loyaltyDto != null){
+            return ResponseEntity.status(HttpStatus.OK).body(accountId);
+        } else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found for ID: " +accountId);
+        }
     }
 
 

@@ -1,7 +1,9 @@
 package be.kdg.sa.clients.services;
 
 import be.kdg.sa.clients.controller.dto.AccountDto;
+import be.kdg.sa.clients.controller.dto.LoyaltyDto;
 import be.kdg.sa.clients.domain.Account;
+import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
@@ -12,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -79,5 +83,48 @@ public class AccountService {
 
     public List<Order> getAccountHistory(UUID accountId) {
         return orderRepository.findAllByAccountId(accountId);
+    }
+
+    public LoyaltyDto getLoyaltyByAccountId(UUID accountId) {
+        logger.info("Retrieving account info for ID: {}", accountId);
+        Account account = accountRepository.findByAccountId(accountId);
+
+        if(account != null){
+            logger.info("account found for ID: {}", accountId);
+            LoyaltyDto loyaltyDto = new LoyaltyDto();
+            loyaltyDto.setAccountId(accountId);
+            loyaltyDto.setFirstName(account.getFirstName());
+            loyaltyDto.setLastName(account.getLastName());
+            loyaltyDto.setLoyaltyLevel(account.getLoyaltyLevel());
+            loyaltyDto.setPoints(account.getPoints());
+            return loyaltyDto;
+        } else{
+            logger.warn("No account found for ID: {}", accountId);
+            return null;
+        }
+    }
+
+    public void updateLoyaltyPointsAndLevel(UUID accountId, int orderPoints){
+        Account account = accountRepository.findByAccountId(accountId);
+
+        if(account != null) {
+            //Calculate and update Loyalty Points
+            logger.info("Calculating and updating the loyalty points of the user: {}", accountId);
+            int points = account.getPoints() + orderPoints;
+            account.setPoints(points);
+
+            //Check and update Loyalty Level
+            logger.info("Checking and updating loyalty level of user: {}", accountId);
+            LoyaltyLevel loyaltyLevel = LoyaltyLevel.getLoyaltyLevel(points);
+            if (loyaltyLevel != account.getLoyaltyLevel()) {
+                account.setLoyaltyLevel(loyaltyLevel);
+            }
+
+            accountRepository.save(account);
+            logger.info("Account updated for Id: {}", accountId);
+        } else{
+            logger.warn("Account with ID: {} was not found", accountId);
+        }
+
     }
 }
