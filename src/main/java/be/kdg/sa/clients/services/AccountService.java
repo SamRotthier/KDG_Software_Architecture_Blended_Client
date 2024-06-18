@@ -4,6 +4,7 @@ import be.kdg.sa.clients.controller.dto.AccountDto;
 import be.kdg.sa.clients.controller.dto.LoyaltyDto;
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
+import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -81,8 +84,21 @@ public class AccountService {
         return accountRepository.findAccountByLastName(lastName);
     }
 
-    public List<Order> getAccountHistory(UUID accountId) {
-        return orderRepository.findAllByAccountId(accountId);
+    public List<Order> getAccountHistory(UUID accountId, OrderStatus orderStatus, LocalDateTime startDate, LocalDateTime endDate) {
+        logger.info("Fetching all orders for account: {}", accountId);
+        List<Order> orders = orderRepository.findAllByAccountId(accountId);
+
+        if(orderStatus != null){
+            logger.info("Filtering orders based on order status: {}", orderStatus);
+            orders = orders.stream().filter(order -> order.getStatus().equals(orderStatus)).toList();
+        }
+
+        if(startDate != null && endDate != null){
+            logger.info("Filtering orders based on date range from {} until {}", startDate, endDate);
+            orders = orders.stream().filter(order -> !order.getCreationDateTime().isBefore(startDate) && !order.getCreationDateTime().isAfter(endDate)).toList();
+        }
+
+        return orders;
     }
 
     public LoyaltyDto getLoyaltyByAccountId(UUID accountId) {

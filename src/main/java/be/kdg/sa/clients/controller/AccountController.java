@@ -3,16 +3,19 @@ package be.kdg.sa.clients.controller;
 import be.kdg.sa.clients.controller.dto.AccountDto;
 import be.kdg.sa.clients.controller.dto.LoyaltyDto;
 import be.kdg.sa.clients.domain.Account;
+import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.services.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 /* mport org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult; */
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,17 +58,22 @@ public class AccountController {
     }
 
     @GetMapping("/{accountId}/history")
-    public ResponseEntity<?> getHistoryByAccountId(@PathVariable ("accountId") UUID accountId){
+    public ResponseEntity<?> getHistoryByAccountId(
+            @PathVariable ("accountId") UUID accountId,
+            @RequestParam(value = "Status", required = false) OrderStatus status,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat (iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat (iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime endDate){
         if(accountId == null || !accountService.exists(accountId)){
             return ResponseEntity.badRequest().body("Invalid request body");
         }
-        List<Order> history = accountService.getAccountHistory(accountId);
+        List<Order> history = accountService.getAccountHistory(accountId, status, startDate, endDate);
         return ResponseEntity.status(HttpStatus.OK).body(history);
     }
 
 
     @GetMapping("/{accountId}/loyalty")
-    public ResponseEntity<?> getLoyaltyByAccountId(@PathVariable("accountId") UUID accountId){
+    public ResponseEntity<?> getLoyaltyByAccountId(
+            @PathVariable("accountId") UUID accountId){
         LoyaltyDto loyaltyDto = accountService.getLoyaltyByAccountId(accountId);
         if(loyaltyDto != null){
             return ResponseEntity.status(HttpStatus.OK).body(accountId);
