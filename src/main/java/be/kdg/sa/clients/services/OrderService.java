@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -150,5 +151,21 @@ public class OrderService {
         order.setTotalPrice(orderToCopy.get().getTotalPrice()); //TODO misschien moet dit nagegeken worden aangezien de persoon ineens in een andere korting category kan zitten
 
         orderRepository.save(order);
+    }
+
+    public List<Order> generateSalesReport(UUID productId, LocalDateTime orderDate,UUID accountId){
+        List<Order> salesReport = new ArrayList<>();
+
+        if(productId != null){
+            logger.info("Generate sales report for product {}", productId);
+            salesReport = orderRepository.findAllByProductId();
+        } else if(orderDate != null){
+            logger.info("Generate sales report for order date {}", orderDate);
+            salesReport = orderRepository.findAllByCreationDateTime(orderDate);
+        } else if(accountId != null){
+            logger.info("Generate sales report for user {}", accountId);
+            salesReport = orderRepository.findAllByAccountId(accountId);
+        }
+        return salesReport;
     }
 }

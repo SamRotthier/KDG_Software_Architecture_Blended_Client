@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,5 +27,8 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     @Modifying
     @Query("UPDATE Order o SET o.account.accountId = null WHERE o.account.accountId = :accountId")
     void nullifyAccountId(@Param("accountId") UUID accountId);
+
+    @Query("SELECT o FROM Order o WHERE o.creationDateTime = :orderDate")
+    List<Order> findAllByCreationDateTime(LocalDateTime orderDate);
 
 }
