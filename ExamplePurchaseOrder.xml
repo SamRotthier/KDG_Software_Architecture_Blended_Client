@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<PurchaseOrder>
+    <Items>
+        <Item ProductNumber="33ab0ee2-cb15-45cf-b96e-c6a08d267e8d">
+            <ProductName>Chocolade Donut</ProductName>
+            <Quantity>100</Quantity>
+            <SpecialInstruction/>
+        </Item>
+    </Items>
+</PurchaseOrder>

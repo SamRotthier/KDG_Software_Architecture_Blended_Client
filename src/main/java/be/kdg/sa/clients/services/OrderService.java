@@ -8,6 +8,7 @@ import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.Enum.ProductState;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.domain.OrderProduct;
+import be.kdg.sa.clients.parsing.PurchaseOrder;
 import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderProductRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
@@ -167,5 +168,14 @@ public class OrderService {
             salesReport = orderRepository.findAllByAccountId(accountId);
         }
         return salesReport;
+    }
+
+    public void testPurchaseOrder(){
+        try {
+            var test= PurchaseOrder.JaxbReadXml("./ExamplePurchaseOrder.xml",OrderProduct.class);
+            logger.info(test.toString());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
