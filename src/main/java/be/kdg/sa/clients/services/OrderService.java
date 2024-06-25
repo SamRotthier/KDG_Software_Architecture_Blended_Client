@@ -154,12 +154,12 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public List<Order> generateSalesReport(UUID productId, LocalDateTime orderDate,UUID accountId){
-        List<Order> salesReport = new ArrayList<>();
+    public List<?> generateSalesReport(UUID productId, LocalDateTime orderDate,UUID accountId){
+        List<?> salesReport = new ArrayList<>();
 
         if(productId != null){
-            logger.info("Generate sales report for product {}", productId);
-            salesReport = orderRepository.findAllByProductId();
+            logger.info("Generate sales report for product {}", productId); // TODO productSalesDto list streamen uit orders en total berekenen
+            //salesReport = orderRepository.findAllByProductId();
         } else if(orderDate != null){
             logger.info("Generate sales report for order date {}", orderDate);
             salesReport = orderRepository.findAllByCreationDateTime(orderDate);

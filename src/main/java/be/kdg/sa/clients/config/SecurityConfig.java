@@ -1,6 +1,7 @@
 package be.kdg.sa.clients.config;
 
-/*
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -25,12 +26,20 @@ import java.util.stream.Collectors;
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
+    @Value("${keycloak.auth-server-url}")
+    private String authServerUrl;
+
+    @Value("${keycloak.realm}")
+    private String realm;
+    String url = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(new AntPathRequestMatcher("/accounts/create")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/accounts/auth")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher(url)).permitAll()
                         .anyRequest().authenticated()
                 ).sessionManagement(mgmt -> mgmt.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(rs -> rs.jwt(jwt -> jwtAuthenticationConverter()));
@@ -57,4 +66,3 @@ class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<GrantedAut
 
 
 }
-*/

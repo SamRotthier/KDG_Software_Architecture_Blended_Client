@@ -105,7 +105,7 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only one parameter (product, date or user) should be provided.");
         }
 
-        List<Order> salesReport = orderService.generateSalesReport(productId, orderDate, accountId);
+        List<?> salesReport = orderService.generateSalesReport(productId, orderDate, accountId);
         if(salesReport != null){
             return ResponseEntity.status(HttpStatus.OK).body(salesReport);
         } else{

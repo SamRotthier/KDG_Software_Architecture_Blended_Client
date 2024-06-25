@@ -1,6 +1,7 @@
 package be.kdg.sa.clients.services;
 
 import be.kdg.sa.clients.controller.dto.AccountDto;
+import be.kdg.sa.clients.controller.dto.KeycloakDto;
 import be.kdg.sa.clients.controller.dto.LoyaltyDto;
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
@@ -12,22 +13,36 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class AccountService {
     private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
     private final AccountRepository accountRepository;
     private final OrderRepository orderRepository;
+
+    @Value("${keycloak.auth-server-url}")
+    private String authServerUrl;
+
+    @Value("${keycloak.realm}")
+    private String realm;
+
+    @Value("${keycloak.resource}")
+    private String clientId;
+
+    @Value("${keycloak.credentials.secret}")
+    private String clientSecret;
 
     public AccountService(AccountRepository accountRepository, OrderRepository orderRepository) {
         this.accountRepository = accountRepository;
@@ -142,5 +157,55 @@ public class AccountService {
             logger.warn("Account with ID: {} was not found", accountId);
         }
 
+    }
+
+    public ResponseEntity<String> createKeycloakUser(AccountDto accountDto) {
+        logger.info("Creating user in Keycloak");
+        String url = authServerUrl + "/admin/realms/" + realm + "/users";
+
+        KeycloakDto keycloakDto = new KeycloakDto(accountDto.getLastName(), accountDto.getFirstName(), accountDto.getUsername(), accountDto.getPassword(), accountDto.getEmail());
+        System.out.println(keycloakDto.getCredentials().get(0).getValue());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(getAdminAccessToken());
+
+        HttpEntity<KeycloakDto> request = new HttpEntity<>(keycloakDto, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            logger.info("User created successfully");
+        } else {
+            logger.error("Failed to create user: " + response.getStatusCode());
+        }
+        return response;
+    }
+
+    public String getAdminAccessToken() {
+        logger.info("Retrieve admin access token");
+        String tokenUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("client_id", clientId);
+        requestBody.add("client_secret", clientSecret);
+        requestBody.add("grant_type", "client_credentials");
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(requestBody, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            logger.info("Admin access token retrieved successfully.");
+            return (String) response.getBody().get("access_token");
+        } else {
+            logger.error("Failed to obtain access token");
+            return null;
+        }
     }
 }

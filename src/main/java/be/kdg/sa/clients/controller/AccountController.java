@@ -7,22 +7,38 @@ import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.services.AccountService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 /* mport org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult; */
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/accounts")
 public class AccountController {
+    private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
+
+    @Value("${keycloak.auth-server-url}")
+    private String authServerUrl;
+
+    @Value("${keycloak.realm}")
+    private String realm;
+
+    @Value("${keycloak.resource}")
+    private String clientId;
+
+    @Value("${keycloak.credentials.secret}")
+    private String clientSecret;
 
     private final AccountService accountService;
     @Autowired
@@ -33,10 +49,35 @@ public class AccountController {
     @PostMapping("/create")
     public ResponseEntity<?> createAccount(@Valid @RequestBody AccountDto accountDto){
        accountService.createAccount(accountDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Account was successfully created");
+       ResponseEntity<String> response = accountService.createKeycloakUser(accountDto);
+       return ResponseEntity.ok(response.getBody());
     }
 
-    // @PreAuthorize("hasRole")
+    @PostMapping("/auth")
+    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
+        logger.info("Fetching auth token");
+        String url = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("client_id", clientId);
+        params.add("client_secret", clientSecret);
+        params.add("username", username);
+        params.add("password", password);
+        params.add("grant_type", "password");
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
+
+        return ResponseEntity.ok(response.getBody());
+    }
+
+    // @PreAuthorize("
+    // ")
     @DeleteMapping("/{accountId}/delete")
     public ResponseEntity<?> deleteAccount(@PathVariable ("accountId") UUID accountId) {
         if(accountId == null || !accountService.exists(accountId)){

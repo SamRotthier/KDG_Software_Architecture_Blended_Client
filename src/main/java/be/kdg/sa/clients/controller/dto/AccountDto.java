@@ -20,8 +20,10 @@ public class AccountDto {
     @NotEmpty
     private String email;
 
-    // @NotBlank
-    // private String password;
+    @NotBlank
+    private String username;
+    @NotBlank
+    private String password;
 
     private String company;
 
@@ -30,10 +32,12 @@ public class AccountDto {
     public AccountDto() {
     }
 
-    public AccountDto(String lastName, String firstName, String email, String company, AccountRelationType type) {
+    public AccountDto(String lastName, String firstName, String email, String username, String password, String company, AccountRelationType type) {
         this.lastName = lastName;
         this.firstName = firstName;
         this.email = email;
+        this.username = username;
+        this.password = password;
         this.company = company;
         this.type = type;
     }
@@ -78,11 +82,19 @@ public class AccountDto {
         this.type = type;
     }
 
-    /*public String getPassword() {
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
-    }*/
+    }
 }
