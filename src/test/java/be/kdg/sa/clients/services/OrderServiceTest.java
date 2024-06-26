@@ -66,7 +66,7 @@ class OrderServiceTest {
     }
 
     @Test
-    public void creatingOrderShouldBeSavedCorrectlyToDB{
+    public void creatingOrderShouldBeSavedCorrectlyToDB (){
 
         UUID orderUuid = UUID.randomUUID();
         OrderProductDto product1 = new OrderProductDto();
