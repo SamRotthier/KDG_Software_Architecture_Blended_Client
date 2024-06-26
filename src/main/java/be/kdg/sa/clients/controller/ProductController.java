@@ -6,6 +6,7 @@ import be.kdg.sa.clients.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class ProductController {
         this.productService = productService;
     }
 
+    @PreAuthorize("hasAnyAuthority('admin')")
     @GetMapping("/new")
     public ResponseEntity<List<ProductDto>> getNewUnpricedProducts(){
         List<Product> unpricedProducts = productService.getNewUnpricedProducts();
@@ -33,7 +35,7 @@ public class ProductController {
         }
 
     }
-
+    @PreAuthorize("hasAnyAuthority('admin')")
     @GetMapping("/")
     public ResponseEntity<List<ProductDto>> getPricedProducts(){
         List<Product> pricedProducts = productService.getPricedProducts();
@@ -42,7 +44,7 @@ public class ProductController {
         } List<ProductDto> pricedProductList = pricedProducts.stream().map(this::convertToDto).toList();
         return ResponseEntity.ok(pricedProductList);
     }
-
+    @PreAuthorize("hasAnyAuthority('admin')")
     @PatchMapping("/{productId}/price")
     public ResponseEntity<ProductDto> setProductPrice(@Valid @PathVariable("productId") UUID id, @RequestParam Double price){
         Product product = productService.setProductPrice(id, price);

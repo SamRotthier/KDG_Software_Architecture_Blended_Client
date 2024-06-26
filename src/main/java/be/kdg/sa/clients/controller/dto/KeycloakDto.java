@@ -3,6 +3,7 @@ package be.kdg.sa.clients.controller.dto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class KeycloakDto {
@@ -13,6 +14,7 @@ public class KeycloakDto {
 
     private boolean enabled;
     private List<Credential> credentials;
+    private List<String> realmRoles;
 
     public KeycloakDto(String lastName, String firstName, String username, String password, String email) {
         this.lastName = lastName;
@@ -21,6 +23,7 @@ public class KeycloakDto {
         this.email = email;
         this.credentials = List.of(new Credential(password));
         this.enabled = true;
+        this.realmRoles = List.of("user");
     }
 
     public String getLastName() {
@@ -74,6 +77,13 @@ public class KeycloakDto {
         this.credentials = credentials;
     }
 
+    public List<String> getRealmRoles() {
+        return realmRoles;
+    }
+
+    public void setRealmRoles(List<String> realmRoles) {
+        this.realmRoles = realmRoles;
+    }
 
     public static class Credential {
         private String type;

@@ -15,6 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
 /* mport org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult; */
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -59,8 +60,7 @@ public class AccountController {
         return ResponseEntity.ok(response.getBody());
     }
 
-    // @PreAuthorize("
-    // ")
+    @PreAuthorize("hasAnyAuthority('user')")
     @DeleteMapping("/{accountId}/delete")
     public ResponseEntity<?> deleteAccount(@PathVariable ("accountId") UUID accountId) {
         if(accountId == null || !accountService.exists(accountId)){
@@ -71,6 +71,7 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Account was successfully deleted");
     }
 
+    @PreAuthorize("hasAnyAuthority('admin')")
     @GetMapping("/{lastName}")
     public ResponseEntity<?> getAccountByLastName(@PathVariable String lastName){
         Optional<Account> accountOptional = accountService.getAccountByLastName(lastName);
@@ -81,6 +82,7 @@ public class AccountController {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('user')")
     @GetMapping("/{accountId}/history")
     public ResponseEntity<?> getHistoryByAccountId(
             @PathVariable ("accountId") UUID accountId,
@@ -94,7 +96,7 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).body(history);
     }
 
-
+    @PreAuthorize("hasAnyAuthority('user')")
     @GetMapping("/{accountId}/loyalty")
     public ResponseEntity<?> getLoyaltyByAccountId(
             @PathVariable("accountId") UUID accountId){

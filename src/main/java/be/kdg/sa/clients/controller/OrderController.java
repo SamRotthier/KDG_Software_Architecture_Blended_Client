@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -40,19 +43,21 @@ public class OrderController {
         return ResponseEntity.ok(foundOrders);
     }
 
+    @PreAuthorize("hasAnyAuthority('user')")
     @PostMapping("/create")
     public ResponseEntity<?> createOrder (@Valid @RequestBody OrderDto orderDto){
         orderService.createOrder(orderDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("The order was successfully created");
     }
 
+    @PreAuthorize("hasAnyAuthority('user')")
     @PostMapping("/{orderId}/create")
     public ResponseEntity<?> createCopyOrder (@Valid @PathVariable UUID orderId){
        orderService.createCopyOrder(orderId);
         return ResponseEntity.status(HttpStatus.CREATED).body("The order was successfully created");
     }
 
-
+    @PreAuthorize("hasAnyAuthority('user')")
     @PutMapping("/{orderId}/confirm")
     public ResponseEntity<?> confirmOrder (@Valid @PathVariable UUID orderId){
         Optional<Order> foundOrder = orderService.getOrderByOrderId(orderId);
@@ -67,7 +72,7 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.CREATED).body("The order was confirmed");
         }
     }
-
+    @PreAuthorize("hasAnyAuthority('user')")
     @PutMapping("/{orderId}/cancel")
     public ResponseEntity<?> cancelOrder (@PathVariable UUID orderId){
         Optional<Order> foundOrder = orderService.getOrderByOrderId(orderId);
@@ -83,6 +88,7 @@ public class OrderController {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('user', 'admin')")
     @GetMapping("/{orderId}")
     public ResponseEntity<?> getOrder (@PathVariable UUID orderId){
          Optional<Order> foundOrder = orderService.getOrderByOrderId(orderId);
@@ -94,6 +100,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body("The order was confirmed");
     }
 
+    @PreAuthorize("hasAnyAuthority('admin')")
     @GetMapping("/report")
     public ResponseEntity<?> generateSalesReport (
             @RequestParam(value = "product", required = false) UUID productId,
