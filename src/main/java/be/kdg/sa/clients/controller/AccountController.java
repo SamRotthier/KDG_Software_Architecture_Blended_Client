@@ -55,24 +55,7 @@ public class AccountController {
 
     @PostMapping("/auth")
     public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
-        logger.info("Fetching auth token");
-        String url = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("client_id", clientId);
-        params.add("client_secret", clientSecret);
-        params.add("username", username);
-        params.add("password", password);
-        params.add("grant_type", "password");
-
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
-
+        ResponseEntity<String> response = accountService.authKeycloakUser(username, password);
         return ResponseEntity.ok(response.getBody());
     }
 

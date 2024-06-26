@@ -185,20 +185,13 @@ public class AccountService {
 
     public String getAdminAccessToken() {
         logger.info("Retrieve admin access token");
-        String tokenUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("client_id", clientId);
         requestBody.add("client_secret", clientSecret);
         requestBody.add("grant_type", "client_credentials");
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(requestBody, headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
+        ResponseEntity<Map> response = sendTokenRequest(requestBody);
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             logger.info("Admin access token retrieved successfully.");
@@ -208,4 +201,39 @@ public class AccountService {
             return null;
         }
     }
+
+    public ResponseEntity<String> authKeycloakUser(String username, String password){
+        logger.info("Fetching auth token");
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("client_id", clientId);
+        params.add("client_secret", clientSecret);
+        params.add("username", username);
+        params.add("password", password);
+        params.add("grant_type", "password");
+
+        ResponseEntity<Map> response = sendTokenRequest(params);
+        ResponseEntity<String> responseString = new ResponseEntity<>(response.getBody().toString(), response.getStatusCode());
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            logger.info("User created successfully");
+        } else {
+            logger.error("Failed to create user: " + response.getStatusCode());
+        }
+        return responseString;
+    }
+
+    private ResponseEntity<Map> sendTokenRequest(MultiValueMap<String, String> params){
+        String tokenUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.postForEntity(tokenUrl, request, Map.class);
+
+    }
+
 }
