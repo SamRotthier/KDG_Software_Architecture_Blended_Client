@@ -20,10 +20,9 @@ public class OrderDto {
     private UUID accountId;
 
 
-    public OrderDto(List<OrderProductDto> products, OrderStatus status, double totalPrice, UUID accountId) {
+    public OrderDto(List<OrderProductDto> products, OrderStatus status, UUID accountId) {
         this.products = products;
         this.status = status;
-        this.totalPrice = totalPrice;
         this.accountId = accountId;
     }
 

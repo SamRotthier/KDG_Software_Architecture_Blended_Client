@@ -27,9 +27,10 @@ public class OrderProduct {
         this.quantity = quantity;
     }
 
-    public OrderProduct(UUID id, Order order, int quantity) {
+    public OrderProduct(UUID id, Order order, Product product, int quantity) {
         this.id = id;
         this.order = order;
+        this.product = product;
         this.quantity = quantity;
     }
 
