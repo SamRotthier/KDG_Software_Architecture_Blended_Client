@@ -131,7 +131,7 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-    private boolean isProductActive(UUID productId) {
+    public boolean isProductActive(UUID productId) {
         return productRepository.findById(productId)
                 .map(product -> product.getProductState() == ProductState.ACTIVE)
                 .orElse(false);
@@ -148,9 +148,8 @@ public class OrderService {
         order.setOrderId(UUID.randomUUID());
         order.setStatus(OrderStatus.PENDING);
         order.setAccount(orderToCopy.get().getAccount());
-        order.setProducts(orderToCopy.get().getProducts()); //TODO Misschien nog nakijken of alle orders nog actief staan
-        order.setTotalPrice(orderToCopy.get().getTotalPrice()); //TODO misschien moet dit nagegeken worden aangezien de persoon ineens in een andere korting category kan zitten
-
+        order.setProducts(orderToCopy.get().getProducts());
+        order.setTotalPrice(orderToCopy.get().getTotalPrice());
         orderRepository.save(order);
     }
 

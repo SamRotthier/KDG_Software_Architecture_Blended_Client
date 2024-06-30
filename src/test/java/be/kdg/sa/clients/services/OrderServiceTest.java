@@ -18,6 +18,7 @@ import be.kdg.sa.clients.sender.RestSender;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
@@ -122,18 +125,144 @@ class OrderServiceTest {
     }
 
     @Test
-    public void createOrderShouldCalculateTotalPriceAndApplyDiscount() {
-
-        given(accountRepository.findByAccountId(orderDto.getAccountId())).willReturn(new Account());
-
-        System.out.println(orderDto);
+    public void createOrderShouldCreateNewOrder() {
+        given(accountRepository.findByAccountId(accountId)).willReturn(account);
+        given(productRepository.findById(productId1)).willReturn(Optional.of(product1));
+        given(productRepository.findById(productId2)).willReturn(Optional.of(product2));
+        given(productRepository.findPriceByProductId(productId1)).willReturn(BigDecimal.TEN);
+        given(productRepository.findPriceByProductId(productId2)).willReturn(BigDecimal.valueOf(15));
+        given(orderRepository.save(any(Order.class))).willReturn(testOrder);
 
         Order createdOrder = orderService.createOrder(orderDto);
 
-        System.out.println(createdOrder);
+        assertNotNull(createdOrder);
+        assertEquals(OrderStatus.PENDING, createdOrder.getStatus());
+        assertEquals(account, createdOrder.getAccount());
+        assertEquals(BigDecimal.valueOf(70), createdOrder.getTotalPrice());
+        assertEquals(2, createdOrder.getProducts().size());
+    }
 
-        // Assert
-        assertEquals(LoyaltyLevel.BRONZE, createdOrder.getAccount().getLoyaltyLevel());
-        assertEquals(BigDecimal.valueOf(70), createdOrder.getTotalPrice()); // 2*10 + 3*15 = 70
+    @Test
+    public void confirmOrderShouldChangeStatusToConfirmed() {
+        given(orderRepository.save(any(Order.class))).willReturn(testOrder);
+
+        orderService.confirmOrder(Optional.of(testOrder));
+
+        assertEquals(OrderStatus.CONFIRMED, testOrder.getStatus());
+    }
+
+    @Test
+    public void confirmOrderShouldNotChangeStatusIfOrderNotFound() {
+        orderService.confirmOrder(Optional.empty());
+
+        assertEquals(OrderStatus.PENDING, testOrder.getStatus()); // Status should remain unchanged
+    }
+
+    @Test
+    public void cancelOrderShouldChangeStatusToCancelled() {
+        given(orderRepository.save(any(Order.class))).willReturn(testOrder);
+
+        orderService.cancelOrder(Optional.of(testOrder));
+
+        assertEquals(OrderStatus.CANCELLED, testOrder.getStatus());
+    }
+
+    @Test
+    public void cancelOrderShouldNotChangeStatusIfOrderNotFound() {
+        orderService.cancelOrder(Optional.empty());
+
+        assertEquals(OrderStatus.PENDING, testOrder.getStatus()); // Status should remain unchanged
+    }
+
+    @Test
+    public void getOrdersShouldReturnAllOrders() {
+        List<Order> orders = new ArrayList<>();
+        orders.add(testOrder);
+        given(orderRepository.findAll()).willReturn(orders);
+
+        List<Order> allOrders = orderService.getOrders();
+
+        assertEquals(1, allOrders.size());
+        assertEquals(testOrder, allOrders.get(0));
+    }
+
+    @Test
+    public void isProductActiveShouldReturnTrueForActiveProduct() {
+        given(productRepository.findById(productId1)).willReturn(Optional.of(product1));
+
+        boolean isActive = orderService.isProductActive(productId1);
+
+        assertTrue(isActive);
+    }
+
+    @Test
+    public void isProductActiveShouldReturnFalseForInactiveProduct() {
+        Product inactiveProduct = new Product(productId1, "Inactive Product", BigDecimal.TEN, "Description", LocalDateTime.now(), ProductState.INACTIVE);
+        given(productRepository.findById(productId1)).willReturn(Optional.of(inactiveProduct));
+
+        boolean isActive = orderService.isProductActive(productId1);
+
+        assertFalse(isActive);
+    }
+
+    @Test
+    public void isProductActiveShouldReturnFalseForNonExistentProduct() {
+        given(productRepository.findById(productId1)).willReturn(Optional.empty());
+
+        boolean isActive = orderService.isProductActive(productId1);
+
+        assertFalse(isActive);
+    }
+
+  /*  @Test
+    public void createOrderShouldWarnWhenNoActiveProductsFound() {
+        List<OrderProductDto> inactiveProductDtos = new ArrayList<>();
+        inactiveProductDtos.add(new OrderProductDto(orderProductId1, orderId, productId1, 2));
+
+        OrderDto inactiveOrderDto = new OrderDto(inactiveProductDtos, OrderStatus.PENDING, accountId);
+        given(accountRepository.findByAccountId(accountId)).willReturn(account);
+        given(productRepository.findById(productId1)).willReturn(Optional.of(new Product(productId1, "Inactive Product", BigDecimal.TEN, "Description", LocalDateTime.now(), ProductState.INACTIVE)));
+
+        Order createdOrder = orderService.createOrder(inactiveOrderDto);
+
+        assertEquals(BigDecimal.ZERO, createdOrder.getTotalPrice());
+        assertTrue(createdOrder.getProducts().isEmpty());
+    } */
+
+    @Test
+    public void createOrderShouldApplyDiscountWhenEligible() {
+        account.setPoints(10000);
+        given(accountRepository.findByAccountId(accountId)).willReturn(account);
+        given(productRepository.findById(productId1)).willReturn(Optional.of(product1));
+        given(productRepository.findById(productId2)).willReturn(Optional.of(product2));
+        given(productRepository.findPriceByProductId(productId1)).willReturn(BigDecimal.TEN);
+        given(productRepository.findPriceByProductId(productId2)).willReturn(BigDecimal.valueOf(15));
+        given(orderRepository.save(any(Order.class))).willReturn(testOrder);
+
+        Order createdOrder = orderService.createOrder(orderDto);
+
+        BigDecimal expectedDiscount = BigDecimal.valueOf(70).multiply(BigDecimal.valueOf(LoyaltyLevel.getDiscount(account.getPoints())));
+        BigDecimal expectedTotalPrice = BigDecimal.valueOf(70).subtract(expectedDiscount);
+
+        assertEquals(expectedTotalPrice, createdOrder.getTotalPrice());
+        assertEquals(expectedDiscount, createdOrder.getTotalDiscount());
+    }
+
+
+    @Test
+    public void createCopyOrderShouldCopyExistingOrder() {
+        given(orderRepository.findOrderByOrderId(orderId)).willReturn(Optional.of(testOrder));
+        ArgumentCaptor<Order> orderCaptor = forClass(Order.class);
+        given(orderRepository.save(orderCaptor.capture())).willAnswer(invocation -> invocation.getArgument(0));
+
+        orderService.createCopyOrder(orderId);
+
+        Order copiedOrder = orderCaptor.getValue();
+        assertNotNull(copiedOrder);
+        assertNotEquals(testOrder.getOrderId(), copiedOrder.getOrderId());
+        assertEquals(OrderStatus.PENDING, copiedOrder.getStatus());
+        assertEquals(testOrder.getAccount(), copiedOrder.getAccount());
+        assertEquals(testOrder.getProducts(), copiedOrder.getProducts());
+        assertEquals(testOrder.getTotalPrice(), copiedOrder.getTotalPrice());
     }
 }
