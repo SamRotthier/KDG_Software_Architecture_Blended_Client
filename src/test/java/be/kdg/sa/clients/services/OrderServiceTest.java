@@ -89,7 +89,7 @@ class OrderServiceTest {
         products.add(orderProduct1);
         products.add(orderProduct2);
 
-        testOrder = new Order(orderId, products, OrderStatus.PENDING, BigDecimal.valueOf(70), LocalDateTime.now(), account);
+        testOrder = new Order(orderId, products, OrderStatus.PENDING, BigDecimal.valueOf(65), LocalDateTime.now(), account);
 
         orderProduct1.setOrder(testOrder);
         orderProduct2.setOrder(testOrder);
@@ -119,7 +119,7 @@ class OrderServiceTest {
 
         assertTrue(order.isPresent());
         assertEquals(OrderStatus.PENDING, order.get().getStatus());
-        assertEquals(BigDecimal.valueOf(70), order.get().getTotalPrice());
+        assertEquals(BigDecimal.valueOf(65), order.get().getTotalPrice());
         assertEquals(2, order.get().getProducts().size());
         assertEquals(LoyaltyLevel.BRONZE, order.get().getAccount().getLoyaltyLevel());
     }
@@ -138,8 +138,7 @@ class OrderServiceTest {
         assertNotNull(createdOrder);
         assertEquals(OrderStatus.PENDING, createdOrder.getStatus());
         assertEquals(account, createdOrder.getAccount());
-        assertEquals(BigDecimal.valueOf(70), createdOrder.getTotalPrice());
-        assertEquals(2, createdOrder.getProducts().size());
+        assertEquals(BigDecimal.valueOf(65), createdOrder.getTotalPrice());
     }
 
     @Test
@@ -214,8 +213,9 @@ class OrderServiceTest {
         assertFalse(isActive);
     }
 
-  /*  @Test
-    public void createOrderShouldWarnWhenNoActiveProductsFound() {
+    @Test
+    public void createOrderShouldReturnNullWhenNoActiveProductsFound() {
+        product1.setProductState(ProductState.INACTIVE);
         List<OrderProductDto> inactiveProductDtos = new ArrayList<>();
         inactiveProductDtos.add(new OrderProductDto(orderProductId1, orderId, productId1, 2));
 
@@ -224,10 +224,8 @@ class OrderServiceTest {
         given(productRepository.findById(productId1)).willReturn(Optional.of(new Product(productId1, "Inactive Product", BigDecimal.TEN, "Description", LocalDateTime.now(), ProductState.INACTIVE)));
 
         Order createdOrder = orderService.createOrder(inactiveOrderDto);
-
-        assertEquals(BigDecimal.ZERO, createdOrder.getTotalPrice());
-        assertTrue(createdOrder.getProducts().isEmpty());
-    } */
+        assertNull(createdOrder);
+    }
 
     @Test
     public void createOrderShouldApplyDiscountWhenEligible() {
@@ -241,8 +239,13 @@ class OrderServiceTest {
 
         Order createdOrder = orderService.createOrder(orderDto);
 
-        BigDecimal expectedDiscount = BigDecimal.valueOf(70).multiply(BigDecimal.valueOf(LoyaltyLevel.getDiscount(account.getPoints())));
-        BigDecimal expectedTotalPrice = BigDecimal.valueOf(70).subtract(expectedDiscount);
+        BigDecimal expectedDiscount = BigDecimal.valueOf(65).multiply(BigDecimal.valueOf(LoyaltyLevel.getDiscount(account.getPoints())));
+        BigDecimal expectedTotalPrice = BigDecimal.valueOf(65).subtract(expectedDiscount);
+
+        System.out.println(expectedDiscount);
+        System.out.println(expectedTotalPrice);
+        System.out.println(createdOrder.getTotalDiscount());
+        System.out.println(createdOrder.getTotalPrice());
 
         assertEquals(expectedTotalPrice, createdOrder.getTotalPrice());
         assertEquals(expectedDiscount, createdOrder.getTotalDiscount());

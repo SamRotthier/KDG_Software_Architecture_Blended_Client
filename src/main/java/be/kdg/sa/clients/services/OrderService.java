@@ -71,39 +71,44 @@ public class OrderService {
         UUID testId = activeProducts.stream().findFirst().orElse(new OrderProductDto()).getProductId();
         if (testId == null) {
             logger.warn("No active products found in the order with ID: {}", orderDto.getOrderId());
+            return null;
         }
 
         //Total Price
         logger.info("Calculate total price");
         BigDecimal totalPrice = activeProducts.stream().filter(i -> i.getProductId() != null).map(p -> productRepository.findPriceByProductId(p.getProductId()).multiply(BigDecimal.valueOf(p.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
-
+        logger.info("Total price: {}", totalPrice);
         //Check discount
         logger.info("Checking and calculating discount");
         order.setLoyaltyLevel(account.getLoyaltyLevel());
         double discount = LoyaltyLevel.getDiscount(account.getPoints());
+        logger.info("Discount calculated: {}", discount);
         if(discount != 0.00){
             BigDecimal totalDiscount = totalPrice.multiply(BigDecimal.valueOf(discount));
-            totalPrice.subtract(totalDiscount);
+            BigDecimal totalPriceDiscounted = totalPrice.subtract(totalDiscount);
             order.setTotalDiscount(totalDiscount);
+            order.setTotalPrice(totalPriceDiscounted);
+            logger.info("Total price after discount: {}", totalPriceDiscounted);
         } else{
             order.setTotalDiscount(BigDecimal.ZERO);
+            order.setTotalPrice(totalPrice);
+            logger.info("Total price without discount: {}", totalPrice);
         }
 
-        order.setTotalPrice(totalPrice);
-        Order savedOrder = orderRepository.save(order);
+        orderRepository.save(order);
         logger.info("Order saved with Id: {}", order.getOrderId());
 
         //Link active products to order
         if(testId != null){
             logger.info("Saving order activeProducts: {}", activeProducts);
-            orderProductRepository.saveAll(activeProducts.stream().filter(i -> i.getProductId() != null).map(i -> new OrderProduct(savedOrder, productRepository.findById(i.getProductId()).orElseThrow(), i.getQuantity())).toList());
+            orderProductRepository.saveAll(activeProducts.stream().filter(i -> i.getProductId() != null).map(i -> new OrderProduct(order, productRepository.findById(i.getProductId()).orElseThrow(), i.getQuantity())).toList());
         }
 
         //Update account
         int calculatedPoints = totalPrice.divide(BigDecimal.TEN, RoundingMode.DOWN).intValue();
         accountService.updateLoyaltyPointsAndLevel(account.getAccountId(), calculatedPoints);
 
-        return savedOrder;
+        return order;
     }
 
     @Transactional
