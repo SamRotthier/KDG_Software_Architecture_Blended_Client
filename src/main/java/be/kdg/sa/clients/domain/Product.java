@@ -25,6 +25,8 @@ public class Product {
     @CreationTimestamp
     private LocalDateTime createdDate;
 
+    private int orderCounter;
+
     public Product(UUID productId, String name, BigDecimal price, String description, LocalDateTime createdDate, ProductState productState) {
         this.productId = productId;
         this.name = name;
@@ -32,6 +34,7 @@ public class Product {
         this.description = description;
         this.createdDate = createdDate;
         this.productState=productState;
+        this.orderCounter = 0;
     }
 
     public Product() {
@@ -91,5 +94,13 @@ public class Product {
 
     public void setProductState(ProductState productState) {
         this.productState = productState;
+    }
+
+    public int getOrderCounter() {
+        return orderCounter;
+    }
+
+    public void setOrderCounter(int orderCounter) {
+        this.orderCounter = orderCounter;
     }
 }

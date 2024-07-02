@@ -2,6 +2,7 @@ package be.kdg.sa.clients.services;
 
 import be.kdg.sa.clients.controller.dto.OrderDto;
 import be.kdg.sa.clients.controller.dto.OrderProductDto;
+import be.kdg.sa.clients.controller.dto.ProductSalesDto;
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
 import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
@@ -27,10 +28,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -267,5 +265,51 @@ class OrderServiceTest {
         assertEquals(testOrder.getAccount(), copiedOrder.getAccount());
         assertEquals(testOrder.getProducts(), copiedOrder.getProducts());
         assertEquals(testOrder.getTotalPrice(), copiedOrder.getTotalPrice());
+    }
+
+
+    @Test
+    void generateSalesReport_forProduct() {
+        given(productRepository.getProductByProductId(productId1)).willReturn(Optional.of(product1));
+
+        List<?> salesReport = orderService.generateSalesReport(productId1, null, null);
+
+        assertNotNull(salesReport);
+        assertEquals(1, salesReport.size());
+        assertTrue(salesReport.get(0) instanceof ProductSalesDto);
+        ProductSalesDto dto = (ProductSalesDto) salesReport.get(0);
+        assertEquals(productId1, dto.getProductId());
+        assertEquals(product1.getName(), dto.getName());
+    }
+
+    @Test
+    void generateNoSalesReportWhenProductNotFound() {
+        given(productRepository.getProductByProductId(productId1)).willReturn(Optional.empty());
+
+        List<?> salesReport = orderService.generateSalesReport(null, null, null);
+
+        assertNull(salesReport);
+    }
+
+    @Test
+    void generateSalesReport_forOrderDate() {
+        List<Order >orderList = Collections.singletonList(testOrder);
+        given(orderRepository.findAllByCreationDateTime(testOrder.getCreationDateTime())).willReturn(orderList);
+
+        List<?> salesReport = orderService.generateSalesReport(null, testOrder.getCreationDateTime(), null);
+
+        assertNotNull(salesReport);
+        assertEquals(orderList.size(), salesReport.size());
+    }
+
+    @Test
+    void generateSalesReport_forAccountId() {
+        List<Order >orderList = Collections.singletonList(testOrder);
+        given(orderRepository.findAllByAccountId(accountId)).willReturn(orderList);
+
+        List<?> salesReport = orderService.generateSalesReport(null, null, accountId);
+
+        assertNotNull(salesReport);
+        assertEquals(orderList.size(), salesReport.size());
     }
 }

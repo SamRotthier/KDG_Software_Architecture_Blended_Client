@@ -52,8 +52,6 @@ public class AccountService {
     @Transactional
     public Account createAccount(AccountDto accountDto){
         logger.info("Creating account for email: {}", accountDto.getEmail());
-        // TODO
-        // check if user already exists
 
         if (accountRepository.existsByEmail(accountDto.getEmail())) {
             logger.warn("Account creation failed: Account with email {} already exists.", accountDto.getEmail());

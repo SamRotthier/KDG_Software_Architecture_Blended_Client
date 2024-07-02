@@ -7,16 +7,15 @@ public class ProductSalesDto {
     private UUID productId;
     private String name;
     private BigDecimal price;
-
     private int quantity;
     private BigDecimal total;
 
-    public ProductSalesDto(UUID productId, String name, BigDecimal price, int quantity, BigDecimal total) {
+    public ProductSalesDto(UUID productId, String name, BigDecimal price, int quantity) {
         this.productId = productId;
         this.name = name;
         this.price = price;
         this.quantity = quantity;
-        this.total = total;
+        this.total = price.multiply(BigDecimal.valueOf(quantity));
     }
 
     public ProductSalesDto() {

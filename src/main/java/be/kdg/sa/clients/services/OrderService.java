@@ -2,12 +2,14 @@ package be.kdg.sa.clients.services;
 
 import be.kdg.sa.clients.controller.dto.OrderDto;
 import be.kdg.sa.clients.controller.dto.OrderProductDto;
+import be.kdg.sa.clients.controller.dto.ProductSalesDto;
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.Enum.ProductState;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.domain.OrderProduct;
+import be.kdg.sa.clients.domain.Product;
 import be.kdg.sa.clients.parsing.PurchaseOrder;
 import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderProductRepository;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 public class OrderService {
@@ -101,7 +104,12 @@ public class OrderService {
         //Link active products to order
         if(testId != null){
             logger.info("Saving order activeProducts: {}", activeProducts);
-            orderProductRepository.saveAll(activeProducts.stream().filter(i -> i.getProductId() != null).map(i -> new OrderProduct(order, productRepository.findById(i.getProductId()).orElseThrow(), i.getQuantity())).toList());
+            List<OrderProduct> orderProducts = activeProducts.stream().filter(i -> i.getProductId() != null).map(i -> {
+                Product product = productRepository.findById(i.getProductId()).orElseThrow();
+                product.setOrderCounter(product.getOrderCounter() + i.getQuantity());
+                return new OrderProduct(order, product, i.getQuantity());
+            }).toList();
+            orderProductRepository.saveAll(orderProducts);
         }
 
         //Update account
@@ -158,18 +166,24 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public List<?> generateSalesReport(UUID productId, LocalDateTime orderDate,UUID accountId){
+    public List<?> generateSalesReport(UUID productId, LocalDateTime orderDate,UUID accountId) {
         List<?> salesReport = new ArrayList<>();
 
-        if(productId != null){
-            logger.info("Generate sales report for product {}", productId); // TODO productSalesDto list streamen uit orders en total berekenen
-            //salesReport = orderRepository.findAllByProductId();
-        } else if(orderDate != null){
+        if (productId != null) {
+            logger.info("Generate sales report for product {}", productId);
+            Optional<Product> productOptional = productRepository.getProductByProductId(productId);
+            if (productOptional.isPresent()) {
+                Product product = productOptional.get();
+                salesReport = Stream.of(new ProductSalesDto(productId, product.getName(), product.getPrice(), product.getOrderCounter())).toList();
+            }
+        } else if (orderDate != null) {
             logger.info("Generate sales report for order date {}", orderDate);
             salesReport = orderRepository.findAllByCreationDateTime(orderDate);
-        } else if(accountId != null){
+        } else if (accountId != null) {
             logger.info("Generate sales report for user {}", accountId);
             salesReport = orderRepository.findAllByAccountId(accountId);
+        } else if (productId == null || orderDate == null || accountId == null) {
+            return null;
         }
         return salesReport;
     }
