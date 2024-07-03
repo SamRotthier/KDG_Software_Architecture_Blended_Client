@@ -55,22 +55,23 @@ public class AccountService {
 
         if (accountRepository.existsByEmail(accountDto.getEmail())) {
             logger.warn("Account creation failed: Account with email {} already exists.", accountDto.getEmail());
+            return null;
+        } else {
+
+            int points = 0; // To check
+            Account account = new Account();
+            account.setAccountId(UUID.randomUUID());
+            account.setLastName(accountDto.getLastName());
+            account.setFirstName(accountDto.getFirstName());
+            account.setEmail(accountDto.getEmail());
+            account.setCompany(accountDto.getCompany());
+            account.setPoints(points);
+            account.setType(accountDto.getType());
+
+            Account savedAccount = accountRepository.save(account);
+            logger.info("Account created successfully: {}", savedAccount);
+            return savedAccount;
         }
-
-        int points = 0; // To check
-        Account account = new Account();
-        account.setAccountId(UUID.randomUUID());
-        account.setLastName(accountDto.getLastName());
-        account.setFirstName(accountDto.getFirstName());
-        account.setEmail(accountDto.getEmail());
-        account.setCompany(accountDto.getCompany());
-        account.setPoints(points);
-        account.setType(accountDto.getType());
-
-        Account savedAccount = accountRepository.save(account);
-        logger.info("Account created successfully: {}", savedAccount);
-
-       return savedAccount;
     }
 
     @Transactional
@@ -162,7 +163,6 @@ public class AccountService {
         String url = authServerUrl + "/admin/realms/" + realm + "/users";
 
         KeycloakDto keycloakDto = new KeycloakDto(accountDto.getLastName(), accountDto.getFirstName(), accountDto.getUsername(), accountDto.getPassword(), accountDto.getEmail());
-        System.out.println(keycloakDto.getCredentials().get(0).getValue());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
