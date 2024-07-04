@@ -14,4 +14,6 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     void deleteByAccountId(UUID accountId);
     Optional<Account> findAccountByLastName(String lastName);
     boolean existsByEmail(String email);
+
+    void deleteAccountByLastName(String name);
 }
