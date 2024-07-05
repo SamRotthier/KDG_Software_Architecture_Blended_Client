@@ -3,6 +3,7 @@ package be.kdg.sa.clients.services;
 import be.kdg.sa.clients.controller.dto.OrderDto;
 import be.kdg.sa.clients.controller.dto.OrderProductDto;
 import be.kdg.sa.clients.controller.dto.ProductSalesDto;
+import be.kdg.sa.clients.controller.dto.parsing.PurchaseOrder;
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
@@ -10,17 +11,21 @@ import be.kdg.sa.clients.domain.Enum.ProductState;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.domain.OrderProduct;
 import be.kdg.sa.clients.domain.Product;
-import be.kdg.sa.clients.parsing.PurchaseOrder;
 import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderProductRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
 import be.kdg.sa.clients.repositories.ProductRepository;
 import be.kdg.sa.clients.sender.RestSender;
+import be.kdg.sa.clients.util.parsing.OrderParserJaxb;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
@@ -29,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -40,14 +46,17 @@ public class OrderService {
     private final AccountRepository accountRepository;
     private final AccountService accountService;
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
+    private final OrderParserJaxb orderParserJaxb;
     private RestSender restSender;
 
-    public OrderService(OrderRepository orderRepository, OrderProductRepository orderProductRepository, ProductRepository productRepository, AccountRepository accountRepository, AccountService accountService, RestSender restSender) {
+
+    public OrderService(OrderRepository orderRepository, OrderProductRepository orderProductRepository, ProductRepository productRepository, AccountRepository accountRepository, AccountService accountService, OrderParserJaxb orderParserJaxb, RestSender restSender) {
         this.orderRepository = orderRepository;
         this.orderProductRepository = orderProductRepository;
         this.productRepository = productRepository;
         this.accountRepository = accountRepository;
         this.accountService = accountService;
+        this.orderParserJaxb = orderParserJaxb;
         this.restSender = restSender;
     }
 
@@ -188,12 +197,23 @@ public class OrderService {
         return salesReport;
     }
 
-    public void testPurchaseOrder(){
-        try {
-            var test= PurchaseOrder.JaxbReadXml("./ExamplePurchaseOrder.xml",OrderProduct.class);
-            logger.info(test.toString());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void PurchaseOrderWithXML(InputStream stream) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        stream.transferTo(baos);
+        InputStream clone = new ByteArrayInputStream(baos.toByteArray());
+        final PurchaseOrder purchaseOrder = orderParserJaxb.read(clone);
+
+        // Map PurchaseOrder to OrderDto
+        List<OrderProductDto> orderProducts = purchaseOrder.getItems().stream()
+                .map(item -> new OrderProductDto(
+                        UUID.randomUUID(), // Assuming this is a new order product
+                        null, // No Order ID yet
+                        UUID.fromString(item.getProductNumber()), // Product ID from XML
+                        item.getQuantity()))
+                .collect(Collectors.toList());
+
+        purchaseOrder.getItems().getI
+
+        OrderDto orderDto = new OrderDto(orderProducts, UUID.randomUUID());
     }
 }

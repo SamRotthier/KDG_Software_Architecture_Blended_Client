@@ -6,7 +6,6 @@ import be.kdg.sa.clients.controller.dto.OrderDto;
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.domain.Product;
-import be.kdg.sa.clients.parsing.PurchaseOrder;
 import be.kdg.sa.clients.services.AccountService;
 import be.kdg.sa.clients.services.OrderService;
 import jakarta.validation.Valid;
@@ -20,7 +19,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -94,9 +95,10 @@ public class OrderController {
          Optional<Order> foundOrder = orderService.getOrderByOrderId(orderId);
         return foundOrder.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
-    @GetMapping("/test")
-    public ResponseEntity<?> testPurchaseOrder (){
-       orderService.testPurchaseOrder();
+
+    @PostMapping("/PurchaseOrderXml")
+    public ResponseEntity<?> PurchaseOrderWithXML (@RequestParam MultipartFile file) throws IOException {
+       orderService.PurchaseOrderWithXML(file.getInputStream());
         return ResponseEntity.status(HttpStatus.CREATED).body("The order was confirmed");
     }
 
