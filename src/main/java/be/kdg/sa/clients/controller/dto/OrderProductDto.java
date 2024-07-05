@@ -20,6 +20,12 @@ public class OrderProductDto {
         this.quantity = quantity;
     }
 
+    public OrderProductDto(UUID orderId, UUID productId, int quantity) {
+        this.orderId = orderId;
+        this.productId = productId;
+        this.quantity = quantity;
+    }
+
     public OrderProductDto() {
 
     }

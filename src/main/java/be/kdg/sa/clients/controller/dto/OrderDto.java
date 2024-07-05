@@ -29,6 +29,8 @@ public class OrderDto {
     public OrderDto(List<OrderProductDto> products, UUID accountId) {
         this.products = products;
         this.accountId = accountId;
+        this.status = OrderStatus.PENDING;
+        this.creationDateTime = LocalDateTime.now();
     }
 
     public OrderDto() {

@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class Item {
     @XmlAttribute(name = "ProductNumber")
-    private UUID productNumber;
+    private String productNumber;
     @XmlElement(name = "ProductName")
     private String productName;
     @XmlElement(name = "Quantity")
@@ -16,11 +16,11 @@ public class Item {
     private String specialInstructions;
 
 
-    public UUID getProductNumber() {
+    public String getProductNumber() {
         return productNumber;
     }
 
-    public void setProductNumber(UUID productNumber) {
+    public void setProductNumber(String productNumber) {
         this.productNumber = productNumber;
     }
 

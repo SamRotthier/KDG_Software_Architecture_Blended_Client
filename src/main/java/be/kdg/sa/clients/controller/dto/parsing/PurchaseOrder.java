@@ -10,13 +10,13 @@ import java.util.Collection;
 public class PurchaseOrder {
     private Collection<Items> items;
 
-    private Account account;
+    private AccountXml account;
 
     public Collection<Items> getItems() {
         return items;
     }
 
-    public Account getAccount() {
+    public AccountXml getAccount() {
         return account;
     }
 

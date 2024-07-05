@@ -3,6 +3,8 @@ package be.kdg.sa.clients.services;
 import be.kdg.sa.clients.controller.dto.OrderDto;
 import be.kdg.sa.clients.controller.dto.OrderProductDto;
 import be.kdg.sa.clients.controller.dto.ProductSalesDto;
+import be.kdg.sa.clients.controller.dto.parsing.Item;
+import be.kdg.sa.clients.controller.dto.parsing.Items;
 import be.kdg.sa.clients.controller.dto.parsing.PurchaseOrder;
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
@@ -18,6 +20,7 @@ import be.kdg.sa.clients.repositories.ProductRepository;
 import be.kdg.sa.clients.sender.RestSender;
 import be.kdg.sa.clients.util.parsing.OrderParserJaxb;
 import jakarta.transaction.Transactional;
+import org.hibernate.engine.internal.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,10 +33,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -203,17 +203,21 @@ public class OrderService {
         InputStream clone = new ByteArrayInputStream(baos.toByteArray());
         final PurchaseOrder purchaseOrder = orderParserJaxb.read(clone);
 
+        Collection<Items> items = purchaseOrder.getItems();
         // Map PurchaseOrder to OrderDto
-        List<OrderProductDto> orderProducts = purchaseOrder.getItems().stream()
-                .map(item -> new OrderProductDto(
-                        UUID.randomUUID(), // Assuming this is a new order product
-                        null, // No Order ID yet
-                        UUID.fromString(item.getProductNumber()), // Product ID from XML
-                        item.getQuantity()))
-                .collect(Collectors.toList());
 
-        purchaseOrder.getItems().getI
+        for (Items item: items) {
+            Collection<Item> itemCollection = item.getItems();
+            logger.info("Save products to orderProductList");
 
-        OrderDto orderDto = new OrderDto(orderProducts, UUID.randomUUID());
+            List<OrderProductDto> orderProducts = itemCollection.stream()
+                    .map(i -> new OrderProductDto(
+                            null,
+                            UUID.fromString(i.getProductNumber()),
+                            i.getQuantity())).toList();
+            logger.info("Make order ready for creation");
+            OrderDto orderDto = new OrderDto(orderProducts, UUID.fromString(purchaseOrder.getAccount().getId()));
+            createOrder(orderDto);
+        }
     }
 }

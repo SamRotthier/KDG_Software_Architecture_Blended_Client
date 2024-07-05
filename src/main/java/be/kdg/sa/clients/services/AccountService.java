@@ -162,7 +162,11 @@ public class AccountService {
         logger.info("Creating user in Keycloak");
         String url = authServerUrl + "/admin/realms/" + realm + "/users";
 
-        KeycloakDto keycloakDto = new KeycloakDto(accountDto.getLastName(), accountDto.getFirstName(), accountDto.getUsername(), accountDto.getPassword(), accountDto.getEmail());
+        Account account = accountRepository.findAccountByEmail(accountDto.getEmail());
+
+        System.out.println(account.getAccountId().toString());
+
+        KeycloakDto keycloakDto = new KeycloakDto(accountDto.getLastName(), accountDto.getFirstName(), accountDto.getUsername(), accountDto.getPassword(), accountDto.getEmail(), account.getAccountId().toString());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

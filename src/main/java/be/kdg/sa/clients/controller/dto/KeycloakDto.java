@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class KeycloakDto {
     private String lastName;
@@ -16,7 +17,9 @@ public class KeycloakDto {
     private List<Credential> credentials;
     private List<String> realmRoles;
 
-    public KeycloakDto(String lastName, String firstName, String username, String password, String email) {
+    private String id;
+
+    public KeycloakDto(String lastName, String firstName, String username, String password, String email, String id) {
         this.lastName = lastName;
         this.firstName = firstName;
         this.username = username;
@@ -24,6 +27,7 @@ public class KeycloakDto {
         this.credentials = List.of(new Credential(password));
         this.enabled = true;
         this.realmRoles = List.of("user");
+        this.id = id;
     }
 
     public String getLastName() {
@@ -83,6 +87,14 @@ public class KeycloakDto {
 
     public void setRealmRoles(List<String> realmRoles) {
         this.realmRoles = realmRoles;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public static class Credential {

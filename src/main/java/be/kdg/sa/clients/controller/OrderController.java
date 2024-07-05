@@ -97,7 +97,7 @@ public class OrderController {
     }
 
     @PostMapping("/PurchaseOrderXml")
-    public ResponseEntity<?> PurchaseOrderWithXML (@RequestParam MultipartFile file) throws IOException {
+    public ResponseEntity<?> PurchaseOrderWithXML (@RequestBody MultipartFile file) throws IOException {
        orderService.PurchaseOrderWithXML(file.getInputStream());
         return ResponseEntity.status(HttpStatus.CREATED).body("The order was confirmed");
     }
