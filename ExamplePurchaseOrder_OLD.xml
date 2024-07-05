@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<PurchaseOrder PurchaseOrderNumber="99503" OrderDate="2023-10-20">
-    <Account Type="B2B">1de496e5-4486-4dec-ae2c-f62317f07c0f</Account>
+<PurchaseOrder>
     <Items>
         <Item ProductNumber="33ab0ee2-cb15-45cf-b96e-c6a08d267e8d">
             <ProductName>Chocolade Donut</ProductName>
@@ -9,6 +8,5 @@
         </Item>
     </Items>
 </PurchaseOrder>
-
 
 
