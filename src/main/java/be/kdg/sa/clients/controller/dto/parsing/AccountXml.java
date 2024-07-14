@@ -1,15 +1,15 @@
 package be.kdg.sa.clients.controller.dto.parsing;
 
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.*;
 
 import java.util.UUID;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class AccountXml {
     @XmlAttribute
     private AccountRelationType type = AccountRelationType.B2B;
-    @XmlElement
+    @XmlValue
     private String id;
 
     public AccountRelationType getType() {

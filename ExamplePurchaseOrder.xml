@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
-<PurchaseOrder PurchaseOrderNumber="99503" OrderDate="2023-10-20">
-    <AccountXML Type="B2B">1de496e5-4486-4dec-ae2c-f62317f07c0f</AccountXML>
+<PurchaseOrder>
+    <AccountXML Type="B2B">e9dbb8f9-ffdc-42b0-b397-03a19c558221</AccountXML>
     <Items>
         <Item ProductNumber="ca1c0c26-6d74-4ad2-ac3e-6dea79385a8c">
-            <ProductName>Chocolade Donut</ProductName>
-            <Quantity>100</Quantity>
+            <ProductName>Donut</ProductName>
+            <Quantity>20</Quantity>
             <SpecialInstruction/>
         </Item>
     </Items>

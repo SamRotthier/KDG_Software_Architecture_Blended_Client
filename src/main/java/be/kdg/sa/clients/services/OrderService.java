@@ -198,6 +198,7 @@ public class OrderService {
     }
 
     public void PurchaseOrderWithXML(InputStream stream) throws IOException {
+        logger.info("Start XML stream");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         stream.transferTo(baos);
         InputStream clone = new ByteArrayInputStream(baos.toByteArray());

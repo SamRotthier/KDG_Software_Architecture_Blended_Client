@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,6 +39,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @PreAuthorize("hasAnyAuthority('admin')")
     @GetMapping("/")
     public ResponseEntity<?> getOrders (){
         List<Order> foundOrders = orderService.getOrders();
@@ -96,9 +98,10 @@ public class OrderController {
         return foundOrder.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/PurchaseOrderXml")
-    public ResponseEntity<?> PurchaseOrderWithXML (@RequestBody MultipartFile file) throws IOException {
-       orderService.PurchaseOrderWithXML(file.getInputStream());
+    @PostMapping(value ="/PurchaseOrderXml", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> PurchaseOrderWithXML (@RequestParam("file") MultipartFile file) throws IOException {
+        System.out.println("Start Stream XML");
+        orderService.PurchaseOrderWithXML(file.getInputStream());
         return ResponseEntity.status(HttpStatus.CREATED).body("The order was confirmed");
     }
 

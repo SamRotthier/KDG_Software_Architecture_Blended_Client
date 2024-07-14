@@ -1,10 +1,13 @@
 package be.kdg.sa.clients.controller.dto.parsing;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 
 import java.util.UUID;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Item {
     @XmlAttribute(name = "ProductNumber")
     private String productNumber;
