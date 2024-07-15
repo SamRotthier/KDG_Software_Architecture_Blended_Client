@@ -80,7 +80,6 @@ class OrderControllerTest {
         orderRepository.saveAndFlush(orderTest);
 
         Account account = new Account();
-        account.setAccountId(UUID.randomUUID());
         account.setFirstName("TestFirst");
         account.setLastName("TestLast");
         account.setType(AccountRelationType.B2B);
@@ -97,10 +96,10 @@ class OrderControllerTest {
         productRepository.saveAndFlush(product1);
 
         Product product2 = new Product();
-        product1.setName("Product2");
-        product1.setProductId(product_id_2);
-        product1.setPrice(BigDecimal.TEN);
-        product1.setProductState(ProductState.ACTIVE);
+        product2.setName("Product2");
+        product2.setProductId(product_id_2);
+        product2.setPrice(BigDecimal.TEN);
+        product2.setProductState(ProductState.ACTIVE);
         productRepository.saveAndFlush(product2);
 
         OrderProductDto productDto1 = new OrderProductDto();
@@ -123,6 +122,8 @@ class OrderControllerTest {
     @AfterEach
     void tearDown() {
         orderRepository.deleteById(order_id);
+        productRepository.deleteById(product_id_1);
+        productRepository.deleteById(product_id_2);
     }
 
     @WithMockUser(authorities = "admin")
