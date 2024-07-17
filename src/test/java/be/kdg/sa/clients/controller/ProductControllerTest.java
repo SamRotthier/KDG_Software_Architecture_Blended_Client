@@ -15,8 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.util.ExceptionCollector;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -36,28 +39,31 @@ class ProductControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductControllerTest.class);
 
-    private static final UUID product_id = UUID.randomUUID();
-
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private ProductService productService;
 
     @Autowired
     private ProductRepository productRepository;
 
+    private UUID product_id;
+    private Product product;
+
     @BeforeEach
     public void setUp(){
         logger.info("Create testdata");
+        product_id = UUID.randomUUID();
         ProductDto productDto = new ProductDto(product_id, "test product", LocalDateTime.now());
 
-        Product product = new Product();
+        product = new Product();
         product.setProductId(productDto.getProductId());
         product.setName(productDto.getName());
         product.setProductState(ProductState.INACTIVE);
         productRepository.save(product);
         logger.info("Test data created: {}", productRepository.findById(product_id));
+
     }
 
     @AfterEach
@@ -66,13 +72,13 @@ class ProductControllerTest {
     }
 
     @Test
-    //@WithMockUser(authorities = "admin") (vergeet uw dependency niet toe te voegen)
+    @WithMockUser(authorities = "admin")
     public void gettingAllNewUnpricedProductsShouldBeOkForAdmin() throws Exception {
         mockMvc.perform(get("/products/new").accept(APPLICATION_JSON)).andExpect(status().isOk()).andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON.toString())).andDo(result -> logger.info(result.getResponse().getContentAsString()));
     }
 
    @Test
-        //@WithMockUser(authorities = "admin") (vergeet uw dependency niet toe te voegen)
+   @WithMockUser(authorities = "admin")
     void settingProductPriceShouldBeOkForAdmin() throws Exception{
         mockMvc.perform(patch("/products/{product}/price", product_id)
                         .accept(APPLICATION_JSON)
@@ -83,9 +89,12 @@ class ProductControllerTest {
     }
 
     @Test
-        //@WithMockUser(authorities = "admin") (vergeet uw dependency niet toe te voegen)
+    @WithMockUser(authorities = "admin")
     void gettingAllPricedProductsShouldBeOkForAdmin() throws Exception {
-        mockMvc.perform(get("/").accept(APPLICATION_JSON)).andExpect(status()
+        product.setPrice(BigDecimal.TEN);
+        productRepository.saveAndFlush(product);
+        System.out.println(productRepository.findById(product_id).get().getPrice());
+        mockMvc.perform(get("/products/").accept(APPLICATION_JSON)).andExpect(status()
                 .isOk()).andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON
                 .toString())).andDo(result -> logger.info(result.getResponse()
                 .getContentAsString()));

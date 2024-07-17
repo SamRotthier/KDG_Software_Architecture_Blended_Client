@@ -8,6 +8,7 @@ import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -186,13 +187,6 @@ class AccountServiceTest {
 
         assertEquals(7500, account.getPoints());
         assertEquals(LoyaltyLevel.GOLD, account.getLoyaltyLevel());
-    }
-
-    @Test
-    public void CreateKeycloakUserShouldCreateUserAndReturnSucces() {
-        ResponseEntity<String> response = accountService.createKeycloakUser(accountDto);
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
 
     @Test

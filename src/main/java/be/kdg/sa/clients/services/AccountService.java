@@ -164,8 +164,6 @@ public class AccountService {
 
         Account account = accountRepository.findAccountByEmail(accountDto.getEmail());
 
-        System.out.println(account.getAccountId().toString());
-
         KeycloakDto keycloakDto = new KeycloakDto(accountDto.getLastName(), accountDto.getFirstName(), accountDto.getUsername(), accountDto.getPassword(), accountDto.getEmail(), account.getAccountId().toString());
 
         HttpHeaders headers = new HttpHeaders();
