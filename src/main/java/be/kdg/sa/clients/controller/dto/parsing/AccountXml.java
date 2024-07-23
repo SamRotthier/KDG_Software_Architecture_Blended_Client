@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class AccountXml {
-    @XmlAttribute
+    @XmlAttribute(name = "Type")
     private AccountRelationType type = AccountRelationType.B2B;
     @XmlValue
     private String id;
