@@ -102,13 +102,9 @@ public class AccountController {
             @PathVariable("accountId") UUID accountId){
         LoyaltyDto loyaltyDto = accountService.getLoyaltyByAccountId(accountId);
         if(loyaltyDto != null){
-            return ResponseEntity.status(HttpStatus.OK).body(accountId);
+            return ResponseEntity.status(HttpStatus.OK).body(loyaltyDto);
         } else{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found for ID: " +accountId);
         }
     }
-
-
-
-
 }

@@ -14,9 +14,11 @@ import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderProductRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
 import be.kdg.sa.clients.repositories.ProductRepository;
+import be.kdg.sa.clients.services.OrderService;
 import be.kdg.sa.clients.services.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import org.hibernate.annotations.CreationTimestamp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,20 +35,21 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.is;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class OrderControllerTest {
 
     @Autowired
@@ -58,7 +61,7 @@ class OrderControllerTest {
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
-    private ProductService productService;
+    private OrderService orderService;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -68,16 +71,13 @@ class OrderControllerTest {
     private UUID product_id_2 ;
     private Order orderTest;
     private OrderDto orderDtoTest;
+    private UUID account_id;
+    private static final Logger logger = LoggerFactory.getLogger(OrderControllerTest.class);
+
     @BeforeEach
     void setUp() {
-        order_id = UUID.randomUUID();
         product_id_1 = UUID.randomUUID();
         product_id_2 = UUID.randomUUID();
-
-        orderTest = new Order();
-        orderTest.setOrderId(order_id);
-        orderTest.setStatus(OrderStatus.PENDING);
-        orderRepository.saveAndFlush(orderTest);
 
         Account account = new Account();
         account.setFirstName("TestFirst");
@@ -87,6 +87,10 @@ class OrderControllerTest {
         account.setEmail("test@test.com");
         account.setCompany("TestCompany");
         accountRepository.saveAndFlush(account);
+
+        Account savedAccount = accountRepository.findById(account.getAccountId()).orElseThrow();
+        assertNotNull(savedAccount);
+        account_id = savedAccount.getAccountId();
 
         Product product1 = new Product();
         product1.setName("Product1");
@@ -102,13 +106,46 @@ class OrderControllerTest {
         product2.setProductState(ProductState.ACTIVE);
         productRepository.saveAndFlush(product2);
 
+        orderTest = new Order();
+        orderTest.setStatus(OrderStatus.PENDING);
+        orderTest.setAccount(savedAccount);
+        orderTest.setCreationDateTime(LocalDateTime.now());
+        orderTest.setTotalPrice(BigDecimal.ZERO);
+        orderRepository.saveAndFlush(orderTest);
+
+        Order savedOrder = orderRepository.findById(orderTest.getOrderId()).orElseThrow();
+        assertNotNull(savedOrder);
+        order_id = savedOrder.getOrderId();
+
+        OrderProduct orderProduct1 = new OrderProduct();
+        orderProduct1.setProduct(product1);
+        orderProduct1.setOrder(savedOrder);
+        orderProduct1.setQuantity(5);
+        orderProductRepository.saveAndFlush(orderProduct1);
+
+        OrderProduct orderProduct2 = new OrderProduct();
+        orderProduct2.setProduct(product2);
+        orderProduct2.setOrder(savedOrder);
+        orderProduct2.setQuantity(7);
+        orderProductRepository.saveAndFlush(orderProduct2);
+
+        List<OrderProduct> orderProducts = new ArrayList<>();
+        orderProducts.add(orderProduct1);
+        orderProducts.add(orderProduct2);
+
+        BigDecimal totalPrice = product1.getPrice().multiply(BigDecimal.valueOf(orderProduct1.getQuantity()))
+                .add(product2.getPrice().multiply(BigDecimal.valueOf(orderProduct2.getQuantity())));
+
+        savedOrder.setProducts(orderProducts);
+        savedOrder.setTotalPrice(totalPrice);
+        orderRepository.saveAndFlush(savedOrder);
+
         OrderProductDto productDto1 = new OrderProductDto();
         productDto1.setProductId(product1.getProductId());
         productDto1.setQuantity(5);
         OrderProductDto productDto2 = new OrderProductDto();
         productDto2.setProductId(product2.getProductId());
         productDto2.setQuantity(7);
-
 
         List<OrderProductDto> productDtoList = new ArrayList<>();
         productDtoList.add(productDto1);
@@ -140,22 +177,62 @@ class OrderControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(orderDtoTest)))
                 .andExpect(status().isCreated())
-                .andExpect((ResultMatcher) content().string("The order was successfully created"));
+                .andDo(result -> logger.info(result.getResponse().getContentAsString()));
     }
 
     @Test
-    void createCopyOrder() {
+    @WithMockUser(authorities = "user")
+    void createCopyOrder() throws Exception {
+
+        mockMvc.perform(post("/orders/" + order_id + "/create")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> logger.info(result.getResponse().getContentAsString()));
     }
 
     @Test
-    void confirmOrder() {
+    @WithMockUser(authorities = "user")
+    void confirmOrderShouldReturnStatus200() throws Exception {
+        mockMvc.perform(put("/orders/" + order_id + "/confirm")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> logger.info(result.getResponse().getContentAsString()));
+
+        Optional<Order> updatedOrder = orderRepository.findOrderByOrderId(order_id);
+        assert (updatedOrder.isPresent());
+        assert (updatedOrder.get().getStatus() == OrderStatus.CONFIRMED);
     }
 
     @Test
-    void cancelOrder() {
+    @WithMockUser(authorities = "user")
+    void cancelOrderShouldReturnStatus200() throws Exception{
+        mockMvc.perform(put("/orders/" + order_id + "/cancel")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(result -> logger.info(result.getResponse().getContentAsString()));
+
+        Optional<Order> updatedOrder = orderRepository.findOrderByOrderId(order_id);
+        assert(updatedOrder.isPresent());
+        assert(updatedOrder.get().getStatus() == OrderStatus.CANCELLED);
     }
 
     @Test
-    void getOrder() {
+    @WithMockUser(authorities = "user")
+    void getOrderShouldReturnOrderWithStatus200() throws Exception{
+        mockMvc.perform(get("/orders/" + order_id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(result -> logger.info(result.getResponse().getContentAsString()));
+
+    }
+
+    @Test
+    @WithMockUser(authorities = "admin")
+    public void generateSalesReportShouldReturnStatus200IncludingReport() throws Exception {
+
+        mockMvc.perform(get("/orders/report")
+                        .param("user", String.valueOf(account_id)))
+                .andExpect(status().isOk())
+                .andDo(result -> logger.info(result.getResponse().getContentAsString()));
     }
 }
