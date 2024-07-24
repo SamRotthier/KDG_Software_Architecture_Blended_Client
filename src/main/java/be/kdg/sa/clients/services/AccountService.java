@@ -4,7 +4,7 @@ import be.kdg.sa.clients.controller.dto.AccountDto;
 import be.kdg.sa.clients.controller.dto.KeycloakDto;
 import be.kdg.sa.clients.controller.dto.LoyaltyDto;
 import be.kdg.sa.clients.domain.Account;
-import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
+import be.kdg.sa.clients.domain.LoyaltyLevel;
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.repositories.AccountRepository;
@@ -31,6 +31,7 @@ public class AccountService {
     private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
     private final AccountRepository accountRepository;
     private final OrderRepository orderRepository;
+    private final LoyaltyLevelService loyaltyLevelService;
 
     @Value("${keycloak.auth-server-url}")
     private String authServerUrl;
@@ -44,9 +45,10 @@ public class AccountService {
     @Value("${keycloak.credentials.secret}")
     private String clientSecret;
 
-    public AccountService(AccountRepository accountRepository, OrderRepository orderRepository) {
+    public AccountService(AccountRepository accountRepository, OrderRepository orderRepository, LoyaltyLevelService loyaltyLevelService) {
         this.accountRepository = accountRepository;
         this.orderRepository = orderRepository;
+        this.loyaltyLevelService = loyaltyLevelService;
     }
 
     @Transactional
@@ -145,8 +147,8 @@ public class AccountService {
 
             //Check and update Loyalty Level
             logger.info("Checking and updating loyalty level of user: {}", accountId);
-            LoyaltyLevel loyaltyLevel = LoyaltyLevel.getLoyaltyLevel(points);
-            if (loyaltyLevel != account.getLoyaltyLevel()) {
+            LoyaltyLevel loyaltyLevel = loyaltyLevelService.getLoyaltyLevel(points);
+            if (loyaltyLevel.getName() != account.getLoyaltyLevel().getName()) {
                 account.setLoyaltyLevel(loyaltyLevel);
             }
 

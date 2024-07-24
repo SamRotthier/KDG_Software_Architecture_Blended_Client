@@ -2,44 +2,31 @@ package be.kdg.sa.clients.controller;
 
 import be.kdg.sa.clients.controller.dto.OrderDto;
 import be.kdg.sa.clients.controller.dto.OrderProductDto;
-import be.kdg.sa.clients.domain.Account;
+import be.kdg.sa.clients.domain.*;
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
-import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.Enum.ProductState;
-import be.kdg.sa.clients.domain.Order;
-import be.kdg.sa.clients.domain.OrderProduct;
-import be.kdg.sa.clients.domain.Product;
-import be.kdg.sa.clients.repositories.AccountRepository;
-import be.kdg.sa.clients.repositories.OrderProductRepository;
-import be.kdg.sa.clients.repositories.OrderRepository;
-import be.kdg.sa.clients.repositories.ProductRepository;
+import be.kdg.sa.clients.repositories.*;
 import be.kdg.sa.clients.services.OrderService;
-import be.kdg.sa.clients.services.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
-import org.hibernate.annotations.CreationTimestamp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -61,6 +48,8 @@ class OrderControllerTest {
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
+    private LoyaltyLevelRepository loyaltyLevelRepository;
+    @Autowired
     private OrderService orderService;
     @Autowired
     private ObjectMapper objectMapper;
@@ -71,6 +60,7 @@ class OrderControllerTest {
     private UUID product_id_2 ;
     private Order orderTest;
     private OrderDto orderDtoTest;
+    private LoyaltyLevel loyaltyLevel;
     private UUID account_id;
     private static final Logger logger = LoggerFactory.getLogger(OrderControllerTest.class);
 
@@ -79,13 +69,17 @@ class OrderControllerTest {
         product_id_1 = UUID.randomUUID();
         product_id_2 = UUID.randomUUID();
 
+        loyaltyLevel = new LoyaltyLevel("Silver", 0.05, 1000, 4999);
+        loyaltyLevelRepository.saveAndFlush(loyaltyLevel);
+
         Account account = new Account();
         account.setFirstName("TestFirst");
         account.setLastName("TestLast");
         account.setType(AccountRelationType.B2B);
-        account.setPoints(100);
+        account.setPoints(1000);
         account.setEmail("test@test.com");
         account.setCompany("TestCompany");
+        account.setLoyaltyLevel(loyaltyLevel);
         accountRepository.saveAndFlush(account);
 
         Account savedAccount = accountRepository.findById(account.getAccountId()).orElseThrow();

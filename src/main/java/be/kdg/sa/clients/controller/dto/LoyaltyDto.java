@@ -1,6 +1,6 @@
 package be.kdg.sa.clients.controller.dto;
 
-import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
+import be.kdg.sa.clients.domain.LoyaltyLevel;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 

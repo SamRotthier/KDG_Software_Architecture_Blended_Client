@@ -1,6 +1,5 @@
 package be.kdg.sa.clients.domain;
 
-import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,7 +23,8 @@ public class Order {
     @CreationTimestamp
     private LocalDateTime creationDateTime;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "loyalty_level_id")
     private LoyaltyLevel loyaltyLevel;
 
     private BigDecimal totalDiscount;

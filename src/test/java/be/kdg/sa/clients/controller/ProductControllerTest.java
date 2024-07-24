@@ -5,6 +5,7 @@ import be.kdg.sa.clients.domain.Enum.ProductState;
 import be.kdg.sa.clients.domain.Product;
 import be.kdg.sa.clients.repositories.ProductRepository;
 import be.kdg.sa.clients.services.ProductService;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class ProductControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductControllerTest.class);

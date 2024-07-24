@@ -3,25 +3,16 @@ package be.kdg.sa.clients.services;
 import be.kdg.sa.clients.controller.dto.OrderDto;
 import be.kdg.sa.clients.controller.dto.OrderProductDto;
 import be.kdg.sa.clients.controller.dto.ProductSalesDto;
-import be.kdg.sa.clients.domain.Account;
+import be.kdg.sa.clients.domain.*;
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
-import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.Enum.ProductState;
-import be.kdg.sa.clients.domain.Order;
-import be.kdg.sa.clients.domain.OrderProduct;
-import be.kdg.sa.clients.domain.Product;
-import be.kdg.sa.clients.repositories.AccountRepository;
-import be.kdg.sa.clients.repositories.OrderProductRepository;
-import be.kdg.sa.clients.repositories.OrderRepository;
-import be.kdg.sa.clients.repositories.ProductRepository;
+import be.kdg.sa.clients.repositories.*;
 import be.kdg.sa.clients.sender.RestSender;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -47,6 +38,8 @@ class OrderServiceTest {
     private AccountRepository accountRepository;
     @MockBean
     private AccountService accountService;
+    @Autowired
+    private LoyaltyLevelService loyaltyLevelService;
     @MockBean
     private RestSender restSender;
     @Autowired
@@ -65,6 +58,9 @@ class OrderServiceTest {
     private OrderProduct orderProduct2;
     private Order testOrder;
     private OrderDto orderDto;
+    private LoyaltyLevel loyaltyLevel;
+    @MockBean
+    private LoyaltyLevelRepository loyaltyLevelRepository;
 
     @BeforeEach
     void setUp() {
@@ -75,7 +71,17 @@ class OrderServiceTest {
         orderProductId1 = UUID.randomUUID();
         orderProductId2 = UUID.randomUUID();
 
-        account = new Account(accountId, "testAchter", "testVoor", "test@test.be", "test NV", 0, AccountRelationType.B2B, LoyaltyLevel.BRONZE);
+        loyaltyLevel = new LoyaltyLevel("Bronze", 0.00, 0, 1000);
+
+        List<LoyaltyLevel> loyaltyLevels = Arrays.asList(
+                new LoyaltyLevel("Bronze", 0, 0, 999),
+                new LoyaltyLevel("Silver",0.05, 1000, 4999),
+                new LoyaltyLevel("Gold",0.10, 5000, 10000)
+        );
+        given(loyaltyLevelRepository.findAll()).willReturn(loyaltyLevels);
+        //given(loyaltyLevelService.getDiscount(1100)).willReturn(0.05);
+
+        account = new Account(accountId, "testAchter", "testVoor", "test@test.be", "test NV", 0, AccountRelationType.B2B, loyaltyLevel);
 
         product1 = new Product(productId1, "Product 1", BigDecimal.TEN, "Description 1", LocalDateTime.now(), ProductState.ACTIVE);
         product2 = new Product(productId2, "Product 2", BigDecimal.valueOf(15), "Description 2", LocalDateTime.now(), ProductState.ACTIVE);
@@ -119,7 +125,7 @@ class OrderServiceTest {
         assertEquals(OrderStatus.PENDING, order.get().getStatus());
         assertEquals(BigDecimal.valueOf(65), order.get().getTotalPrice());
         assertEquals(2, order.get().getProducts().size());
-        assertEquals(LoyaltyLevel.BRONZE, order.get().getAccount().getLoyaltyLevel());
+        assertEquals("Bronze", order.get().getAccount().getLoyaltyLevel().getName());
     }
 
     @Test
@@ -227,7 +233,7 @@ class OrderServiceTest {
 
     @Test
     public void createOrderShouldApplyDiscountWhenEligible() {
-        account.setPoints(10000);
+        account.setPoints(5080);
         given(accountRepository.findByAccountId(accountId)).willReturn(account);
         given(productRepository.findById(productId1)).willReturn(Optional.of(product1));
         given(productRepository.findById(productId2)).willReturn(Optional.of(product2));
@@ -237,13 +243,10 @@ class OrderServiceTest {
 
         Order createdOrder = orderService.createOrder(orderDto);
 
-        BigDecimal expectedDiscount = BigDecimal.valueOf(65).multiply(BigDecimal.valueOf(LoyaltyLevel.getDiscount(account.getPoints())));
-        BigDecimal expectedTotalPrice = BigDecimal.valueOf(65).subtract(expectedDiscount);
+        assertEquals(0.10, loyaltyLevelService.getDiscount(5080));
 
-        System.out.println(expectedDiscount);
-        System.out.println(expectedTotalPrice);
-        System.out.println(createdOrder.getTotalDiscount());
-        System.out.println(createdOrder.getTotalPrice());
+        BigDecimal expectedDiscount = BigDecimal.valueOf(65).multiply(BigDecimal.valueOf(loyaltyLevelService.getDiscount(account.getPoints())));
+        BigDecimal expectedTotalPrice = BigDecimal.valueOf(65).subtract(expectedDiscount);
 
         assertEquals(expectedTotalPrice, createdOrder.getTotalPrice());
         assertEquals(expectedDiscount, createdOrder.getTotalDiscount());
@@ -311,5 +314,23 @@ class OrderServiceTest {
 
         assertNotNull(salesReport);
         assertEquals(orderList.size(), salesReport.size());
+    }
+
+    @Test
+    public void createOrderShouldCalculateTotalPriceCorrectly() {
+        given(accountRepository.findByAccountId(accountId)).willReturn(account);
+        given(productRepository.findById(productId1)).willReturn(Optional.of(product1));
+        given(productRepository.findById(productId2)).willReturn(Optional.of(product2));
+        given(productRepository.findPriceByProductId(productId1)).willReturn(BigDecimal.TEN);
+        given(productRepository.findPriceByProductId(productId2)).willReturn(BigDecimal.valueOf(15));
+
+
+        BigDecimal expectedTotalPrice = BigDecimal.TEN.multiply(BigDecimal.valueOf(2))
+                .add(BigDecimal.valueOf(15).multiply(BigDecimal.valueOf(3)));
+
+        Order createdOrder = orderService.createOrder(orderDto);
+
+        assertNotNull(createdOrder);
+        assertEquals(expectedTotalPrice, createdOrder.getTotalPrice());
     }
 }

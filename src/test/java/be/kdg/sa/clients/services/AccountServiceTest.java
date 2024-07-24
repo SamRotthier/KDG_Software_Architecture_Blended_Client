@@ -4,19 +4,16 @@ import be.kdg.sa.clients.controller.dto.AccountDto;
 import be.kdg.sa.clients.controller.dto.LoyaltyDto;
 import be.kdg.sa.clients.domain.Account;
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
-import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
+import be.kdg.sa.clients.domain.LoyaltyLevel;
 import be.kdg.sa.clients.domain.Order;
 import be.kdg.sa.clients.repositories.AccountRepository;
 import be.kdg.sa.clients.repositories.OrderRepository;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -42,10 +39,12 @@ class AccountServiceTest {
     private AccountService accountService;
 
     private AccountDto accountDto;
+    private LoyaltyLevel loyaltyLevel;
 
     @BeforeEach
     void setUp() {
         accountDto = new AccountDto("TestLast", "TestFirst", "test.test@gmail.com", "testuser", "password", "Test BV", AccountRelationType.B2B);
+        loyaltyLevel = new LoyaltyLevel("Silver", 0.05, 1000, 5000);
     }
 
     @AfterEach
@@ -161,7 +160,7 @@ class AccountServiceTest {
         account.setFirstName("TestFirst");
         account.setLastName("TestLast");
         account.setPoints(4500);
-        account.setLoyaltyLevel(LoyaltyLevel.SILVER);
+        account.setLoyaltyLevel(loyaltyLevel);
         when(accountRepository.findByAccountId(accountId)).thenReturn(account);
 
         LoyaltyDto loyaltyDto = accountService.getLoyaltyByAccountId(accountId);
@@ -171,7 +170,7 @@ class AccountServiceTest {
         assertEquals("TestFirst", loyaltyDto.getFirstName());
         assertEquals("TestLast", loyaltyDto.getLastName());
         assertEquals(4500, loyaltyDto.getPoints());
-        assertEquals(LoyaltyLevel.SILVER, loyaltyDto.getLoyaltyLevel());
+        assertEquals("Silver", loyaltyDto.getLoyaltyLevel().getName());
     }
 
     @Test
@@ -180,13 +179,13 @@ class AccountServiceTest {
         Account account = new Account();
         account.setAccountId(accountId);
         account.setPoints(4500);
-        account.setLoyaltyLevel(LoyaltyLevel.SILVER);
+        account.setLoyaltyLevel(loyaltyLevel);
         when(accountRepository.findByAccountId(accountId)).thenReturn(account);
 
         accountService.updateLoyaltyPointsAndLevel(accountId, 3000);
 
         assertEquals(7500, account.getPoints());
-        assertEquals(LoyaltyLevel.GOLD, account.getLoyaltyLevel());
+        assertEquals("GOLD", account.getLoyaltyLevel().getName());
     }
 
     @Test

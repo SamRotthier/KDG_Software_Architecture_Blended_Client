@@ -1,7 +1,7 @@
 package be.kdg.sa.clients.domain;
 
 import be.kdg.sa.clients.domain.Enum.AccountRelationType;
-import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
+import be.kdg.sa.clients.domain.LoyaltyLevel;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -19,7 +19,9 @@ public class Account {
     private String email;
     private String company;
     private int points;
-    @Enumerated(EnumType.STRING)
+
+    @ManyToOne
+    @JoinColumn(name = "loyalty_level_id")
     private LoyaltyLevel loyaltyLevel;
 
     @Enumerated(EnumType.STRING)
@@ -39,7 +41,7 @@ public class Account {
         this.company = company;
         this.points = points;
         this.type = type;
-        this.loyaltyLevel = LoyaltyLevel.BRONZE;
+        this.loyaltyLevel = loyaltyLevel;
     }
 
 

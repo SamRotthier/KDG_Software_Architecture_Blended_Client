@@ -7,7 +7,6 @@ import be.kdg.sa.clients.controller.dto.parsing.Item;
 import be.kdg.sa.clients.controller.dto.parsing.Items;
 import be.kdg.sa.clients.controller.dto.parsing.PurchaseOrder;
 import be.kdg.sa.clients.domain.Account;
-import be.kdg.sa.clients.domain.Enum.LoyaltyLevel;
 import be.kdg.sa.clients.domain.Enum.OrderStatus;
 import be.kdg.sa.clients.domain.Enum.ProductState;
 import be.kdg.sa.clients.domain.Order;
@@ -20,7 +19,6 @@ import be.kdg.sa.clients.repositories.ProductRepository;
 import be.kdg.sa.clients.sender.RestSender;
 import be.kdg.sa.clients.util.parsing.OrderParserJaxb;
 import jakarta.transaction.Transactional;
-import org.hibernate.engine.internal.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,10 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -45,17 +41,19 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final AccountRepository accountRepository;
     private final AccountService accountService;
+    private final LoyaltyLevelService loyaltyLevelService;
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
     private final OrderParserJaxb orderParserJaxb;
     private RestSender restSender;
 
 
-    public OrderService(OrderRepository orderRepository, OrderProductRepository orderProductRepository, ProductRepository productRepository, AccountRepository accountRepository, AccountService accountService, OrderParserJaxb orderParserJaxb, RestSender restSender) {
+    public OrderService(OrderRepository orderRepository, OrderProductRepository orderProductRepository, ProductRepository productRepository, AccountRepository accountRepository, AccountService accountService, LoyaltyLevelService loyaltyLevelService, OrderParserJaxb orderParserJaxb, RestSender restSender) {
         this.orderRepository = orderRepository;
         this.orderProductRepository = orderProductRepository;
         this.productRepository = productRepository;
         this.accountRepository = accountRepository;
         this.accountService = accountService;
+        this.loyaltyLevelService = loyaltyLevelService;
         this.orderParserJaxb = orderParserJaxb;
         this.restSender = restSender;
     }
@@ -93,8 +91,9 @@ public class OrderService {
         //Check discount
         logger.info("Checking and calculating discount");
         order.setLoyaltyLevel(account.getLoyaltyLevel());
-        double discount = LoyaltyLevel.getDiscount(account.getPoints());
-        logger.info("Discount calculated: {}", discount);
+        logger.info("Current points of account: {}", account.getPoints());
+        double discount = loyaltyLevelService.getDiscount(account.getPoints());
+        logger.info("Discount %: {}", discount);
         if(discount != 0.00){
             BigDecimal totalDiscount = totalPrice.multiply(BigDecimal.valueOf(discount));
             BigDecimal totalPriceDiscounted = totalPrice.subtract(totalDiscount);
