@@ -98,6 +98,7 @@ public class OrderController {
         return foundOrder.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('user', 'admin')")
     @PostMapping(value ="/PurchaseOrderXml", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> PurchaseOrderWithXML (@RequestParam("file") MultipartFile file) throws IOException {
         System.out.println("Start Stream XML");

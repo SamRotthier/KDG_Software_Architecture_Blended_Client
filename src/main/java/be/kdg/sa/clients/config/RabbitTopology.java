@@ -67,8 +67,6 @@ public class RabbitTopology {
         return BindingBuilder.bind(newConfirmOrderQueue()).to(topicExchange()).with(CONFIRM_ORDER_QUEUE);
     }
 
-
-
     @Bean
     RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory){
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);

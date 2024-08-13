@@ -204,7 +204,6 @@ public class OrderService {
         final PurchaseOrder purchaseOrder = orderParserJaxb.read(clone);
 
         Collection<Items> items = purchaseOrder.getItems();
-        // Map PurchaseOrder to OrderDto
 
         for (Items item: items) {
             Collection<Item> itemCollection = item.getItems();
@@ -219,5 +218,6 @@ public class OrderService {
             OrderDto orderDto = new OrderDto(orderProducts, UUID.fromString(purchaseOrder.getAccount().getId()));
             createOrder(orderDto);
         }
+        logger.info("End XML stream");
     }
 }

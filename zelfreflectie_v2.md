@@ -126,4 +126,49 @@ _eventuele vragen voor je coach_
 - Testing page
 - Loyaliteit
 - Uitbreidingen zijn verplicht
-  
+
+
+# V3
+
+## Tweede zit
+
+### Geschatte Progress (in procent): 95%
+
+### Status
+
+### Status
+
+**Waar sta je globaal?**
+
+Het project is volgens ons afgewerkt. We hebben alle US van de opdracht voltooid. De volgende zaken werden na het examen in juni geïmplementeerd:
+- Alle Unit-Testen & integratietesting met een line coverage van +80%
+- loyaliteitsniveaus (+ mogelijkheid tot admin ervan)
+- toekomstige uitbreidingen verwerkt 
+- ...
+
+
+
+**Wat loopt goed en minder goed?**
+
+(V1) De hele opstart van het project liep niet goed. Er kroop enorm veel tijd in het bestuderen van Spring en hoe dit juist werkt. Ondanks onze ervaring in Java, was de manier van werken toch even aanpassen. De opgenomen theorielessen hielpen ons om de concepten beter te begrijpen, maar het was nog steeds een drempel om de linken te leggen tussen de concepten. Alsook hoe dit juist praktisch moest worden uitgewerkt. Daarnaast hebben we ook veel tijd (+/- 20u) gestoken in het opzetten van de database met Docker. Momenteel zoeken we nog uit hoe we dit over 3 applicaties heen goed kunnen laten werken.
+
+(V2) Echter waren er enkele zaken die een stuk complexer waren om te implementeren dan vooraf gedacht. Naast het lesmateriaal hebben we nog heel wat opzoekwerk moeten verrichten om het zo goed mogelijk aan het werk te krijgen. Dit was voor bijvoorbeeld security met KeyCloak niet gelukt. Ook Thymeleaf was moeilijk te doorgronden. Zeker in een dynamische context (in combinatie met Javascript), werkte dit niet zoals verwacht. Hierdoor was de combinatie tussen dynamische pagina's laden en ondertussen saven naar de database geen optie.
+
+Verder ondervonden ook problemen met het converteren van messages van de queu van de ene API naar de andere. Hierbij moesten we steeds in heel wat verschillende klassen debuggen om het effectieve probleem op te lossen.
+
+(V3) Implementatie van Keycloak verliep enorm moeizaam. Het uitwerken van alle unit testen heeft ook heel wat tijd in beslag genomen. Daarnaast hebben we de algemene code kwaliteit ook verbeterd om het project te verbeteren + ontvangen feedback verwerkt.
+
+**Hoe verloopt de samenwerking?**
+
+De samenwerking is vlot verlopen. We hebben steeds nauw samengewerkt via Teams calls. We hebben het werk zo goed mogelijk proberen te verdelen, maar aangezien dat het meeste met elkaar gelinkt was, was het voor ons makkelijker om op deze manier te werken. Op die manier konden we elkaar helpen met vragen en errors.
+
+
+**Wie heeft globaal welke delen van de applicatie uitgewerkt?**
+
+Sam heeft voornamelijk de Warehouse API op zich genomen. Matthias heeft de Bakery API uitgewerkt. De Clients API hebben we gezamenlijk via Teams uitgewerkt. 
+
+Over het algemeen werkte we altijd tegelijkertijd aan het project via Teams mbv screensharing. In Git zal je een commit van 1 persoon zien, maar in werkelijkheid werd deze door beide uitgewerkt en/of gereviewd op hetzelfde moment.
+
+### Stories
+
+Allemaal afgewerkt.

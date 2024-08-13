@@ -60,7 +60,7 @@ public class AccountService {
             return null;
         } else {
 
-            int points = 0; // To check
+            int points = 0;
             Account account = new Account();
             account.setAccountId(UUID.randomUUID());
             account.setLastName(accountDto.getLastName());
@@ -136,6 +136,7 @@ public class AccountService {
         }
     }
 
+    @Transactional
     public void updateLoyaltyPointsAndLevel(UUID accountId, int orderPoints){
         Account account = accountRepository.findByAccountId(accountId);
 
@@ -159,6 +160,7 @@ public class AccountService {
         }
 
     }
+
 
     public ResponseEntity<String> createKeycloakUser(AccountDto accountDto) {
         logger.info("Creating user in Keycloak");
